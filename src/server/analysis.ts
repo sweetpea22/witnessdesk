@@ -4,9 +4,9 @@ import {z} from 'zod';
 
 export const adviceSchema=z.object({openQuestions:z.array(z.string().min(5).max(280)).min(1).max(3),recipientIds:z.array(z.string()).max(3)});
 export function supportedAmounts(text:string){
- const match=text.match(/(?:Amount\s+(?:sent|paid)|Payment\s+amount)\s*:\s*(?:USD\s*|\$)?([\d,]+(?:\.\d{1,2})?)/i);
- const amount=match?Number(match[1].replaceAll(',','')):null;
- const linked=/INV-204/.test(text)&&/K-17/.test(text);
+ const matches=[...text.matchAll(/^[ \t]*(?:Amount[ \t]+(?:sent|paid)|Payment[ \t]+amount)[ \t]*:[ \t]*(?:USD[ \t]*|\$)?(\d+(?:,\d{3})*(?:\.\d{1,2})?)[ \t]*$/gim)];
+ const amount=matches.length===1?Number(matches[0][1].replaceAll(',','')):null;
+ const linked=/^Invoice reference:[ \t]*INV-204[ \t]*$/mi.test(text)&&/^Contract:[ \t]*K-17[ \t]*$/mi.test(text);
  return {invoiceAmount:120000,paymentAmount:linked&&amount!==null&&Number.isFinite(amount)&&amount>=0?amount:null};
 }
 export function extractJson(text:string){const cleaned=text.replace(/<think>[\s\S]*?<\/think>/g,'').replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();const start=cleaned.indexOf('{');const end=cleaned.lastIndexOf('}');return JSON.parse(cleaned.slice(start,end+1));}
@@ -24,7 +24,9 @@ export async function analyzeTip(tip:Tip,profiles:RecipientProfile[]):Promise<An
   const result=await client.chat.completions.create({model,messages:[{role:'system',content:instruction},{role:'user',content:input}],temperature:0,max_tokens:500,response_format:{type:'json_object'}});
   text=result.choices[0]?.message?.content||'';
  }else if(provider==='ollama'){
-  const response=await fetch(`${process.env.OLLAMA_URL||'http://127.0.0.1:11434'}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,stream:false,format:'json',messages:[{role:'system',content:instruction},{role:'user',content:input}],options:{temperature:0,num_predict:400,num_ctx:4096}}),signal:AbortSignal.timeout(180000)});
+  const url=new URL('/api/chat',process.env.OLLAMA_URL||'http://127.0.0.1:11434');
+  if(!['localhost','127.0.0.1','[::1]'].includes(url.hostname))throw new Error('Local analysis requires an Ollama loopback endpoint.');
+  const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,stream:false,format:'json',messages:[{role:'system',content:instruction},{role:'user',content:input}],options:{temperature:0,num_predict:400,num_ctx:4096}}),signal:AbortSignal.timeout(180000)});
   if(!response.ok)throw new Error(`Local model returned ${response.status}. Check Ollama and retry.`);
   const result=await response.json();text=result.message?.content||'';
  }else if(provider==='deterministic-demo'){

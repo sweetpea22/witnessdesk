@@ -11,7 +11,10 @@ const PAIR_KEY = 'witness-contributor-pair';
 function freshId() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
   const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16));
-  return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
 function getPairFromLocation(): Pairing | null {
@@ -53,23 +56,35 @@ export default function ContributorApp() {
 
   useEffect(() => {
     let cancelled = false;
+    let connectionAttempt = 0;
     async function connect() {
+      const attempt = ++connectionAttempt;
+      setConnecting(true);
+      setError('');
       try {
         let pair = getPairFromLocation();
-        if (!pair && new URLSearchParams(window.location.search).get('demo') === '1') {
+        if (new URLSearchParams(window.location.search).get('demo') === '1') {
           const desk = await ensureDeskSession();
           pair = { sessionId: desk.sessionId, senderCapability: desk.senderCapability };
           sessionStorage.setItem(PAIR_KEY, JSON.stringify(pair));
         }
-        if (!cancelled) setPairing(pair);
+        if (!cancelled && attempt === connectionAttempt) setPairing(pair);
         const providerStatus = await getProviderStatus();
-        if (!cancelled) setStatus(providerStatus);
+        if (!cancelled && attempt === connectionAttempt) setStatus(providerStatus);
       } catch (cause) {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : 'Could not reach the desk. Please try again.');
-      } finally { if (!cancelled) setConnecting(false); }
+        if (!cancelled && attempt === connectionAttempt) setError(cause instanceof Error ? cause.message : 'Could not reach the desk. Please try again.');
+      } finally { if (!cancelled && attempt === connectionAttempt) setConnecting(false); }
     }
+    function reconnect() {
+      if (!window.location.hash) return;
+      pending.current = null;
+      setReceipt(null);
+      setStage('compose');
+      void connect();
+    }
+    window.addEventListener('hashchange', reconnect);
     void connect();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; window.removeEventListener('hashchange', reconnect); };
   }, []);
 
   const tip: Tip = { contributorAlias: alias.trim() || 'Contributor', evidenceText: evidence.trim(), ...(context.trim() ? { contextNote: context.trim() } : {}) };

@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "corpusHash": "8fc954efdd86ed33ac928e23398d6b754d34cdddeb03fc7904c2b89801b22504",
+  "extracted": [
+    {
+      "id": "maya-chen",
+      "region": "Brooklyn, New York",
+      "evidence": [
+        {
+          "specialty": "Procurement",
+          "sourceId": "maya-contracts",
+          "quote": "Maya Chen investigates Procurement and Payments."
+        },
+        {
+          "specialty": "Payments",
+          "sourceId": "maya-contracts",
+          "quote": "Maya Chen investigates Procurement and Payments."
+        },
+        {
+          "specialty": "Local government",
+          "sourceId": "maya-oversight",
+          "quote": "Maya Chen covers Local government and Procurement."
+        }
+      ]
+    },
+    {
+      "id": "luis-rivera",
+      "region": "Queens, New York",
+      "evidence": [
+        {
+          "specialty": "Labor",
+          "sourceId": "luis-wages",
+          "quote": "Luis Rivera reports on Labor."
+        },
+        {
+          "specialty": "Worker safety",
+          "sourceId": "luis-safety",
+          "quote": "Luis Rivera covers Worker safety and Labor."
+        }
+      ]
+    },
+    {
+      "id": "priya-shah",
+      "region": "Hudson Valley, New York",
+      "evidence": [
+        {
+          "specialty": "Water quality",
+          "sourceId": "priya-water",
+          "quote": "Priya Shah investigates Water quality and Environment."
+        },
+        {
+          "specialty": "Environment",
+          "sourceId": "priya-enforcement",
+          "quote": "Priya Shah covers Environment and Local government."
+        }
+      ]
+    }
+  ],
+  "report": {
+    "state": "ready",
+    "provider": "ollama",
+    "model": "llama3:8b",
+    "startedAt": "2026-11-07T18:43:28.495Z",
+    "runId": "cc04b6fd-7c7d-4faa-a4b7-ccb22893467b",
+    "sourceCount": 6,
+    "profileCount": 3,
+    "completedAt": "2026-11-07T18:43:49.409Z"
+  }
+}
