@@ -43,4 +43,4 @@ Use the [local desk](http://localhost:5173/desk) for the Greenpoint photo demo. 
 
 ![Slide 5: The fictional Greenpoint cleanup case in the app](docs/pitch/slide-5.png)
 
-![Slide 6: Hosted demo link and local photo demo](docs/pitch/slide-6.png)
+![Slide 6: Open the hosted demo](docs/pitch/slide-6.png)
