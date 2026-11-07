@@ -30,3 +30,17 @@ Darkbloom receives public bios and articles, never private tips. The first netwo
 - Encryption does not guarantee anonymity, and a payment discrepancy does not prove corruption. Sessions are temporary. The JSON manifest retains original evidence even after the Markdown is edited.
 
 Use the [local desk](http://localhost:5173/desk) for the Greenpoint photo demo. The [hosted text demo](https://localpoast.janedoe.containers.tinfoil.dev/desk) predates these new PDF fixtures. All case records are fictional.
+
+## Pitch deck
+
+![Slide 1: Sensitive evidence and finding the right reporter](docs/pitch/slide-1.png)
+
+![Slide 2: Witness Desk turns a document into a cited story packet](docs/pitch/slide-2.png)
+
+![Slide 3: Local Ollama, Darkbloom, and Tinfoil model roles](docs/pitch/slide-3.png)
+
+![Slide 4: Three journalist conversations, C$5 received, and the test offer and acceptance](docs/pitch/slide-4.png)
+
+![Slide 5: The fictional Greenpoint cleanup case in the app](docs/pitch/slide-5.png)
+
+![Slide 6: Hosted demo link and local photo demo](docs/pitch/slide-6.png)
