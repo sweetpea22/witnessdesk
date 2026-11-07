@@ -61,7 +61,7 @@ Reader and sender capabilities are separate; sender access cannot read or reset 
 
 ## Sponsor readiness
 
-Tinfoil inference and Darkbloom preparation have both completed live requests. Local development is explicitly labeled. The Tinfoil bounty requires actual Container deployment; hosted inference alone does not meet that criterion. [Deployment artifacts and remaining account/publication gates](docs/tinfoil-deployment.md) include a text-only Container candidate; the live photo flow still runs on the laptop.
+The [hosted phone and desk preview](https://localpoast.janedoe.containers.tinfoil.dev/preview) now runs as a verified Tinfoil Container using public config release v0.0.3 and a private application image. The live encrypted API and production browser text flows passed: Cindy's $230,000 discrepancy, exact citations, verified Tinfoil inference, Darkbloom-prepared recipient matching, brief download, and session reset. [Deployment and verification details](docs/tinfoil-deployment.md) include repeatable checks and the startup fixes. Hosted intake currently supports text; photo interpretation still runs on the local laptop.
 
 See [sponsor execution evidence and remaining gates](docs/sponsor-evidence.md). The [event submission instructions](https://localhostai.nyc/submitting) require a public repository and two-minute video by 5 PM. This repository is currently private as requested; publication, collaborator invitations, and event submission have not been performed.
 

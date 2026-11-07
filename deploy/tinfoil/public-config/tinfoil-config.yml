@@ -3,7 +3,7 @@
 # Pinned private AMD64 image built from source commit 76c1df7.
 # Proposed separate public repository: sweetpea22/localpoast-tinfoil-config.
 # Official template snapshot: bae2dd20dd17d5fd7708783ab84e5da296c061cf.
-cvm-version: "0.14.7"
+cvm-version: "0.14.9"
 cpus: 2
 memory: 8192
 
@@ -34,6 +34,7 @@ containers:
         export PUBLIC_ORIGIN="https://$DOMAIN"
         exec ./node_modules/.bin/tsx src/server/index.ts
     env:
+      - DOMAIN
       - NODE_ENV: "production"
       - PORT: "3001"
       - ANALYSIS_PROVIDER: "tinfoil"

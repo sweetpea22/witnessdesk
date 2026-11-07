@@ -31,22 +31,15 @@ The review retained the $230,000 application-calculated difference and selected 
 
 Sanitized metadata, a screenshot, and the synthetic brief are retained locally in ignored `artifacts/qa-tinfoil-review/`. This attests the hosted inference service, not a Container deployment of Localpoast.
 
-## Container readiness: deployment not established
+## Container deployment: verified
 
-Only presence was checked; credential values and configuration addresses were not recorded.
+At 20:14 UTC on November 7, config release **v0.0.3** passed the live Container checks at [the hosted preview](https://localpoast.janedoe.containers.tinfoil.dev/preview). The application repo and GHCR image remain private; the separate config repo is public with user approval. CVM 0.14.9 resolves the upstream registry credential bug, and the config passes Tinfoil's assigned DOMAIN into the app. Debug mode is off and confidential computing is enabled.
 
-| Prerequisite | Observed presence |
-| --- | --- |
-| `TINFOIL_API_KEY` | Present; inference request succeeded |
-| `TINFOIL_ADMIN_KEY` | Replaced by user; fresh read-only check now confirms organization context and zero existing containers |
-| `TINFOIL_CONTAINER_URL` | Absent |
-| `TINFOIL_CONFIG_REPO` | Absent |
-| `tinfoil` CLI executable | Version 0.19.20 installed for deployment preparation; read-only authentication check succeeded |
-| Repository Dockerfile | Present |
-| Tinfoil config candidate | Prepared under deploy/tinfoil; publication/deployment not performed |
-| Workflow directory | Present; existing `check.yml` only |
+The CLI verified the exact release and received a healthy response. The Node SDK reported `securityVerified: true` for `sweetpea22/localpoast-tinfoil-config`, release digest `db08ed432a9ad74872c0f411f43dfb8dec63608709656c13c2239493094b72a5`, matching code/enclave fingerprints, and an attested HPKE key. It then submitted Cindy's synthetic payment over encrypted transport. Tinfoil inference used `llama3-3-70b` in 2,982 ms and supplied its own verified document. The result retained the $120,000 invoice, $350,000 payment, $230,000 difference, exact source citations, and Maya's recommendation from three Darkbloom-prepared profiles (19 graph nodes, 20 source-linked edges). Sender credentials could not read the desk; reset invalidated the old session.
 
-No Container was created or deployed, and no repository or configuration was published. This successful inference request does **not** demonstrate the Container deployment required by the Tinfoil track described in [sponsor execution evidence](sponsor-evidence.md). Containers-enabled organization access, deployment configuration, a live instance, and a verified application request remain unverified.
+A separate production Chromium run passed phone review/send/receipt, desk analysis, both source inspectors, Maya's source-backed profile, brief download with verification metadata, and reset. No provider stubs, TLS exceptions, or attestation bypasses were used. Sanitized artifacts remain local in ignored `artifacts/container-verification/` and `artifacts/container-browser/`. See [deployment details and repeatable commands](tinfoil-deployment.md).
+
+This hosted flow currently supports text. Photo interpretation still runs through local Ollama on the laptop; the hosted image does not contain that model. Physical-phone interaction with the hosted URL and event submission remain outstanding.
 
 ## Darkbloom: successful after credits were added
 
