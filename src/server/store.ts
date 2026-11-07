@@ -1,0 +1,13 @@
+import {createHash,randomBytes,timingSafeEqual} from 'node:crypto';
+import type {Tip,Submission,Receipt} from '../shared/contracts';
+const digest=(value:string)=>createHash('sha256').update(value).digest('hex');
+export class ApiError extends Error{constructor(public status:number,message:string){super(message);}}
+type Session={id:string;readerHash:string;senderHash:string;sender:string;createdAt:number;submissions:Map<string,Submission>;digests:Map<string,string>};
+export class DeskStore{
+ sessions=new Map<string,Session>();
+ create(readerSecret:string){if(readerSecret.length<40)throw new ApiError(400,'Reader secret is too short.');if(this.sessions.size>=20)throw new ApiError(429,'Demo session limit reached. Reset an existing desk.');const id=randomBytes(16).toString('hex');const sender=randomBytes(32).toString('hex');this.sessions.set(id,{id,readerHash:digest(readerSecret),senderHash:digest(sender),sender,createdAt:Date.now(),submissions:new Map(),digests:new Map()});return {sessionId:id,senderCapability:sender};}
+ get(id:string){const s=this.sessions.get(id);if(!s||Date.now()-s.createdAt>8*3600000)throw new ApiError(410,'This demo session expired. Reopen the desk and pair again.');return s;}
+ authorize(id:string,secret:string,role:'reader'|'sender'){const s=this.get(id);const expected=role==='reader'?s.readerHash:s.senderHash;if(!secret||!timingSafeEqual(Buffer.from(digest(secret)),Buffer.from(expected)))throw new ApiError(403,'This access link does not authorize that action.');return s;}
+ submit(id:string,sender:string,submissionId:string,tip:Tip):{receipt:Receipt;submission:Submission;isNew:boolean}{const s=this.authorize(id,sender,'sender');const d=digest(JSON.stringify({contributorAlias:tip.contributorAlias,evidenceText:tip.evidenceText,contextNote:tip.contextNote||''}));const existing=s.submissions.get(submissionId);if(existing){if(s.digests.get(submissionId)!==d)throw new ApiError(409,'This submission ID already belongs to different evidence.');return {receipt:{submissionId,receivedAt:existing.receivedAt,state:'received'},submission:existing,isNew:false};}if(s.submissions.size>=20)throw new ApiError(429,'This demo desk is full. Reset before adding more.');const submission:Submission={id:submissionId,tip,receivedAt:new Date().toISOString(),state:'received'};s.submissions.set(submissionId,submission);s.digests.set(submissionId,d);return {receipt:{submissionId,receivedAt:submission.receivedAt,state:'received'},submission,isNew:true};}
+ reset(id:string,secret:string,newSecret:string){this.authorize(id,secret,'reader');this.sessions.delete(id);return this.create(newSecret);}
+}
