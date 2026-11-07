@@ -1,6 +1,8 @@
 # Tinfoil Container deployment candidate
 
-Prepared 2026-11-07. Nothing has been deployed, published to GHCR, or copied into a public repository. These files are a reviewable candidate for a **text-only enclave demo**; the existing phone photo demonstration continues on the laptop.
+Prepared 2026-11-07. The private AMD64 image has been built and published to private GHCR. Nothing has been deployed to Tinfoil or copied into a public repository. These files are a reviewable candidate for a **text-only enclave demo**; the existing phone photo demonstration continues on the laptop.
+
+The successful [private image build](https://github.com/sweetpea22/localpoast/actions/runs/42407644582) used source commit `76c1df7ccce1eccfc15f7c69985c626a2e7c8bbe`. The image is `ghcr.io/sweetpea22/localpoast@sha256:a444a506749aac00571e0ab2f88c0f8d82f670ce3a54ebbf7f9791b6db19c4e5` with tag `v0.0.1`. GitHub's package API confirms visibility `private`. The candidate config pins that exact digest and proposes the separate public repository `sweetpea22/localpoast-tinfoil-config`.
 
 ## Files and visibility
 
@@ -22,6 +24,8 @@ The official CLI **0.19.20** was downloaded to `/tmp/localpoast-tinfoil-cli-0.19
 After the administration key was replaced, a fresh authenticated read-only check succeeded: `whoami` now reports **organization context**, and container listing returns zero instances. The check parsed the current `TINFOIL_ADMIN_KEY` directly from the project's `.env`, removed `TINFOIL_API_KEY` from the child environment, and used an empty alternate saved-login path. This excludes accidentally using the inference key or an old saved login. No key or account identifier was printed or passed as a command-line argument.
 
 Organization authentication is confirmed. These responses did not report an explicit Containers subscription or deployment-capacity entitlement; successful listing alone does not establish either. The remaining gates are Containers entitlement/capacity, approval for the separate public config repository and publishing/deployment actions, a real private AMD64 image digest, registry pull credentials and runtime secrets, then the measured release and a verified request. No publication or deployment was attempted. [Admin-key instructions](https://docs.tinfoil.sh/admin/get-admin-key), [CLI authentication](https://docs.tinfoil.sh/containers/cli#authenticating)
+
+A further read-only setup check reports **Tier 1**, with **0 of 5 containers** and **0 of 32 GB storage** in use. GHCR registry credentials are **not configured**; the registry-status query succeeds. There are no existing Tinfoil projects, and the available-host query returns an empty list. The current CLI has no repository-list command, so GitHub App authorization for the proposed public config repository is not established by these checks. Connect that repository after its creation. Quota headroom does not confirm an active Containers subscription or reserve a host for deployment. [Infrastructure-limit reference](https://docs.tinfoil.sh/admin/admin-api#infrastructure-limits)
 
 The CLI does not automatically read this project's `.env`. It gives `TINFOIL_ADMIN_KEY` precedence over inference credentials and saved login. The session's check used an explicitly controlled child environment. For an interactive login, remove inherited credential overrides from that CLI invocation and use its prompt; do not paste credentials into shell arguments.
 
@@ -54,7 +58,7 @@ For this checkpoint, demonstrate the real photo → local vision → reviewed te
    gh run list --repo APPROVED_OWNER/localpoast --workflow build-image.yml
    ```
 
-4. Replace the image owner, complete 64-character image digest, and public config `owner/repo` in the candidate config. Install its pinned validation dependency in an isolated environment and run its guards. The unresolved template intentionally fails:
+4. The candidate now contains the actual image owner/digest and proposed public config `owner/repo`. For subsequent builds, update those values explicitly. Install its pinned validation dependency in an isolated environment and run its guards; unresolved placeholders are rejected:
 
    ```sh
    python3 -m venv /tmp/localpoast-tinfoil-validation

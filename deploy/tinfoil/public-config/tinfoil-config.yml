@@ -1,6 +1,6 @@
 # CANDIDATE ONLY. Copy this directory into a separately approved PUBLIC repo.
 # localpoast source and GHCR image remain private.
-# Replace the image digest; validate-config.py rejects the unresolved value.
+# Pinned private AMD64 image built from source commit 76c1df7.
 # Proposed separate public repository: sweetpea22/localpoast-tinfoil-config.
 # Official template snapshot: bae2dd20dd17d5fd7708783ab84e5da296c061cf.
 cvm-version: "0.14.7"
@@ -15,7 +15,7 @@ networks:
 
 containers:
   - name: localpoast
-    image: "ghcr.io/sweetpea22/localpoast@sha256:REPLACE_WITH_64_HEX_IMAGE_DIGEST"
+    image: "ghcr.io/sweetpea22/localpoast@sha256:a444a506749aac00571e0ab2f88c0f8d82f670ce3a54ebbf7f9791b6db19c4e5"
     read_only: true
     user: "1000:1000"
     networks: [outbound]
