@@ -56,7 +56,7 @@ test('desk requests a verified Tinfoil review, exports a cited brief, and reconn
  await download.saveAs(testInfo.outputPath('cindy-case-brief.md'));
  const downloadedPath=await download.path();expect(downloadedPath).toBeTruthy();
  const brief=await readFile(downloadedPath!,'utf8');
- expect(brief).toContain('$230,000');expect(brief).toContain('INV-204');
+ expect(brief).toContain('$230,000');expect(brief).toContain('INV204');
  expect(brief).toContain('PAY-882');expect(brief).toContain('Tinfoil');
  expect(brief).toContain(analysis.verification.releaseDigest);
  const session=await page.evaluate(()=>JSON.parse(localStorage.getItem('witness-desk.session.v1')!));

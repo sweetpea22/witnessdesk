@@ -7,3 +7,5 @@ artifacts/
 .runtime/
 test-results/
 playwright-report/
+output/pdf/
+tmp/pdfs/

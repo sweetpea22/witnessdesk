@@ -1,0 +1,27 @@
+{
+  "invoiceId": "INV204",
+  "supplier": "Harbor Works",
+  "supplierService": "Environmental field services",
+  "client": "Greenpoint Waterfront Recovery Project",
+  "project": "Phase 1 water-pollution response",
+  "location": "Newtown Creek waterfront, Greenpoint, Brooklyn",
+  "workArea": "GP-04 demo shoreline zone",
+  "contract": "K-17",
+  "date": "2026-11-03",
+  "dueDate": "2026-11-17",
+  "servicePeriod": "2026-10-26 to 2026-10-30",
+  "currency": "USD",
+  "items": [
+    { "description": "Mobilization and site setup", "detail": "Crew mobilization, access setup and containment plan", "quantity": 1, "unit": "lot", "rate": 18000 },
+    { "description": "Floating containment boom", "detail": "Installation, daily attendance and removal", "quantity": 5, "unit": "days", "rate": 4200 },
+    { "description": "Polluted-water recovery", "detail": "Vacuum recovery of oily water within the contained area", "quantity": 5, "unit": "shifts", "rate": 6400 },
+    { "description": "Shoreline debris removal", "detail": "Collection, segregation and controlled washdown", "quantity": 4, "unit": "shifts", "rate": 5250 },
+    { "description": "Transport and disposal", "detail": "Container handling, transport and disposal charges", "quantity": 1, "unit": "lot", "rate": 16000 },
+    { "description": "Water sampling and closeout", "detail": "Post-work sampling, laboratory analysis and field report", "quantity": 1, "unit": "lot", "rate": 12000 }
+  ],
+  "amountDue": 120000,
+  "scope": "Temporary containment and recovery at one shoreline work area. Creek-wide remediation and dredging are excluded.",
+  "terms": "Net 14. All charges are included in the fixed contract price. Any change to the invoiced amount requires an approved written change order.",
+  "closeout": "Closeout records required: daily crew logs, waste manifests and water-sampling results.",
+  "disclaimer": "Fictional demo invoice. Contractor, client, work and prices are invented. Not payable."
+}

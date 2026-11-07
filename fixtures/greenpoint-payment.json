@@ -1,0 +1,11 @@
+{
+  "paymentId": "PAY-882",
+  "invoiceReference": "INV204",
+  "contract": "K-17",
+  "dateSent": "2026-11-05",
+  "amountSent": 350000,
+  "currency": "USD",
+  "status": "Completed",
+  "recordType": "Internal accounts-payable register",
+  "disclaimer": "Fictional demo payment record. No real transfer or bank details."
+}

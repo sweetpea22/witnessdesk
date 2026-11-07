@@ -1,6 +1,6 @@
 # Shared implementation contract
 
-Phone: Cindy submits payment confirmation showing USD 350,000 sent against invoice INV-204 for USD 120,000. Difference USD 230,000. Invoice is stored desk context; no procurement approval fixture. All people and records fictional.
+Phone: Cindy submits payment PAY-882 showing USD 350,000 sent against Invoice INV204 for USD 120,000 of Greenpoint shoreline water-pollution response work. Difference USD 230,000. Canonical invoice/payment records live in fixtures/greenpoint-invoice.json and fixtures/greenpoint-payment.json; the PDF generators and desk use these same records. Legacy INV-204 is accepted for earlier demo photos. Invoice is stored desk context; there is no approved change-order fixture. The case and documents are fictional; the separately prepared public reporter profiles describe real professionals.
 
 Root owns src/shared, src/server, package files, app scaffold and global styles. Agent A owns src/contributor. Agent B owns src/desk. Agent C owns src/recipients and fixtures. Never edit another lane or package.json without root coordination.
 

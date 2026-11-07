@@ -1,3 +1,6 @@
+import invoiceFixture from '../../fixtures/greenpoint-invoice.json';
+import paymentFixture from '../../fixtures/greenpoint-payment.json';
+
 export type SubmissionState='received'|'analyzing'|'ready'|'failed';
 export type Tip={contributorAlias:string;evidenceText:string;contextNote?:string;photoId?:string};
 export type PhotoDescription={id:string;description:string;extractedText:string;uncertainties:string[];provider:'ollama';model:string;durationMs:number};
@@ -21,6 +24,42 @@ export type ReporterMatchRun={state:'matching'|'ready'|'failed';cohortIds:string
 export type ReporterNetwork={cohorts:ReporterCohort[];profiles:RecipientProfile[];graph:RecipientGraph;preparation:PreparationReport};
 export type DeskSnapshot={submissions:Submission[];recipients:RecipientProfile[];graph:RecipientGraph;status:ProviderStatus;reporterNetwork?:ReporterNetwork};
 export const DEMO_ALIAS='Cindy';
-export const INVOICE_TEXT='INVOICE INV-204\nSupplier: Harbor Works\nContract: K-17\nDate: 2026-11-03\nDescription: Drainage repairs\nAmount due: USD 120,000';
-export const DEMO_EVIDENCE='PAYMENT CONFIRMATION PAY-882\nBeneficiary: Harbor Works\nInvoice reference: INV-204\nContract: K-17\nDate sent: 2026-11-05\nAmount sent: USD 350,000\nStatus: Completed';
-export const DEMO_CONTEXT='I am Cindy. We were invoiced $120,000 for this work, but our payment record shows that we sent $350,000 instead. I want a journalist to investigate what happened.';
+export const DEMO_INVOICE=invoiceFixture;
+export const DEMO_PAYMENT=paymentFixture;
+const invoiceNumber=(amount:number)=>amount.toLocaleString('en-US',{maximumFractionDigits:2});
+export const INVOICE_TEXT=[
+ `INVOICE ${DEMO_INVOICE.invoiceId}`,
+ `Supplier: ${DEMO_INVOICE.supplier}`,
+ `Supplier service: ${DEMO_INVOICE.supplierService}`,
+ `Client: ${DEMO_INVOICE.client}`,
+ `Project: ${DEMO_INVOICE.project}`,
+ `Location: ${DEMO_INVOICE.location}`,
+ `Work area: ${DEMO_INVOICE.workArea}`,
+ `Contract: ${DEMO_INVOICE.contract}`,
+ `Date: ${DEMO_INVOICE.date}`,
+ `Due date: ${DEMO_INVOICE.dueDate}`,
+ `Service period: ${DEMO_INVOICE.servicePeriod}`,
+ 'Itemized charges:',
+ ...DEMO_INVOICE.items.map((item,index)=>`${index+1}. ${item.description}: ${item.quantity} ${item.unit} at ${DEMO_INVOICE.currency} ${invoiceNumber(item.rate)} = ${DEMO_INVOICE.currency} ${invoiceNumber(item.quantity*item.rate)}\n   ${item.detail}`),
+ `Amount due: ${DEMO_INVOICE.currency} ${invoiceNumber(DEMO_INVOICE.amountDue)}`,
+ `Scope: ${DEMO_INVOICE.scope}`,
+ `Terms: ${DEMO_INVOICE.terms}`,
+ `Closeout: ${DEMO_INVOICE.closeout}`,
+ DEMO_INVOICE.disclaimer,
+].join('\n');
+export const DEMO_EVIDENCE=[
+ `PAYMENT CONFIRMATION ${DEMO_PAYMENT.paymentId}`,
+ `Record type: ${DEMO_PAYMENT.recordType}`,
+ `Beneficiary: ${DEMO_INVOICE.supplier}`,
+ `Payer: ${DEMO_INVOICE.client}`,
+ `Project: ${DEMO_INVOICE.project}`,
+ `Location: ${DEMO_INVOICE.location}`,
+ `Work area: ${DEMO_INVOICE.workArea}`,
+ `Invoice reference: ${DEMO_PAYMENT.invoiceReference}`,
+ `Contract: ${DEMO_PAYMENT.contract}`,
+ `Date sent: ${DEMO_PAYMENT.dateSent}`,
+ `Amount sent: ${DEMO_PAYMENT.currency} ${invoiceNumber(DEMO_PAYMENT.amountSent)}`,
+ `Status: ${DEMO_PAYMENT.status}`,
+ DEMO_PAYMENT.disclaimer,
+].join('\n');
+export const DEMO_CONTEXT=`I am Cindy, reviewing the Greenpoint water-pollution cleanup records for ${DEMO_INVOICE.project}. ${DEMO_INVOICE.supplier} invoiced $${invoiceNumber(DEMO_INVOICE.amountDue)}, but the payment record shows $${invoiceNumber(DEMO_PAYMENT.amountSent)} sent. I could not find an approved written change order in the records available to me. This is my unverified context, not proof that no change order exists.`;

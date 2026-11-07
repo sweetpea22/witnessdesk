@@ -123,7 +123,7 @@ test('Cindy sends encrypted evidence from a paired phone; a lost receipt retry c
       await expect(desk.locator('.desk-citation')).toHaveCount(2);
       await desk.locator('.desk-source-button').first().click();
       await expect(desk.getByRole('dialog', { name: 'Source inspector' })).toBeVisible();
-      await expect(desk.locator('.desk-inspector-document')).toContainText('INV-204');
+      await expect(desk.locator('.desk-inspector-document')).toContainText('INV204');
       await desk.getByRole('button', { name: 'Close source inspector' }).click();
       await desk.getByText('Original submission', { exact: true }).click();
       await expect(desk.locator('.desk-original pre')).toHaveText(DEMO_EVIDENCE);

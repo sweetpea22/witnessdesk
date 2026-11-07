@@ -1,5 +1,5 @@
 import { test, expect, devices, type Browser, type Page, type TestInfo } from '@playwright/test';
-import { DEMO_CONTEXT } from '../src/shared/contracts';
+import { DEMO_CONTEXT, DEMO_INVOICE, DEMO_PAYMENT } from '../src/shared/contracts';
 
 type Pairing = { sessionId: string; senderCapability: string };
 
@@ -36,13 +36,13 @@ async function paymentPhoto(browser: Browser, testInfo: TestInfo): Promise<Buffe
       .amount dd{font-size:64px}.footer{margin-top:34px;font-size:24px;color:#555}
     </style></head><body><main>
       <div class="demo">FICTIONAL DEMO RECORD</div>
-      <h1>PAYMENT CONFIRMATION</h1><p class="reference">PAY-882</p>
-      <dl><div><dt>Beneficiary</dt><dd>HarborWorks</dd></div>
-      <div><dt>Invoice reference</dt><dd>INV-204</dd></div>
-      <div><dt>Contract</dt><dd>K-17</dd></div>
-      <div><dt>Date sent</dt><dd>2026-11-05</dd></div>
-      <div class="amount"><dt>Amount sent</dt><dd>USD 350,000</dd></div>
-      <div><dt>Status</dt><dd>Completed</dd></div></dl>
+      <h1>PAYMENT CONFIRMATION</h1><p class="reference">${DEMO_PAYMENT.paymentId}</p>
+      <dl><div><dt>Beneficiary</dt><dd>${DEMO_INVOICE.supplier}</dd></div>
+      <div><dt>Invoice reference</dt><dd>${DEMO_PAYMENT.invoiceReference}</dd></div>
+      <div><dt>Contract</dt><dd>${DEMO_PAYMENT.contract}</dd></div>
+      <div><dt>Date sent</dt><dd>${DEMO_PAYMENT.dateSent}</dd></div>
+      <div class="amount"><dt>Amount sent</dt><dd>${DEMO_PAYMENT.currency} ${DEMO_PAYMENT.amountSent.toLocaleString('en-US')}</dd></div>
+      <div><dt>Status</dt><dd>${DEMO_PAYMENT.status}</dd></div></dl>
       <p class="footer">Synthetic record for the Witness Desk demo.</p>
     </main></body></html>`);
     const image = await page.screenshot({ fullPage: true, type: 'png' });
@@ -92,7 +92,7 @@ test('Cindy reviews a real local vision description and submits an encrypted pho
   const phone = await phoneContext.newPage();
   try {
     const pairing = await pairPhone(desk, phone);
-    const reviewedAddition = 'Reviewed by Cindy: compare this payment with invoice INV-204 before drawing conclusions.';
+    const reviewedAddition = 'Reviewed by Cindy: compare this payment with invoice INV204 before drawing conclusions.';
     const wireRecords: Array<{ path: string; keys: string[]; armored: boolean; leaks: string[] }> = [];
     phone.on('request', request => {
       if (request.method() !== 'POST') return;
@@ -103,7 +103,7 @@ test('Cindy reviews a real local vision description and submits an encrypted pho
         path: new URL(request.url()).pathname,
         keys: Object.keys(envelope),
         armored: typeof envelope.ciphertext === 'string' && envelope.ciphertext.startsWith('-----BEGIN PGP MESSAGE-----'),
-        leaks: ['data:image/', 'PAY-882', 'HarborWorks', '350,000', 'Cindy', reviewedAddition].filter(value => wire.includes(value)),
+        leaks: ['data:image/', 'PAY-882', DEMO_INVOICE.supplier, '350,000', 'Cindy', reviewedAddition].filter(value => wire.includes(value)),
       });
     });
 

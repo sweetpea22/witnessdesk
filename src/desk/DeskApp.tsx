@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowDownLeft, ArrowRight, ArrowUpRight, BookOpen, Camera, Check, ChevronRight, CircleHelp, Download, FileText, Fingerprint, GitBranch, Inbox, LoaderCircle, LockKeyhole, Network, RefreshCw, RotateCcw, Search, ShieldCheck, Smartphone, Sparkles, X } from 'lucide-react';
 import { contributorUrl, ensureDeskSession, getProviderStatus, matchPublicReporters, preparePublicReporters, prepareRecipients, readDesk, reconnectDeskSession, resetDesk, retryAnalysis } from '../shared/api';
-import { INVOICE_TEXT } from '../shared/contracts';
+import { DEMO_INVOICE, INVOICE_TEXT } from '../shared/contracts';
 import type { Analysis, Citation, DeskSession, DeskSnapshot, GraphNode, RecipientGraph, RecipientProfile, RecipientSource, Submission } from '../shared/contracts';
 import './desk.css';
 import PhotoInspector from './PhotoInspector';
@@ -207,7 +207,7 @@ export default function DeskApp() {
         {tab === 'evidence' ? <div className="desk-evidence-layout">
           <section className="desk-inbox"><div className="desk-section-label"><span>Submissions</span><span className="desk-count">{submissions.length}</span></div>
             {submissions.map(sub => <button key={sub.id} className={`desk-inbox-card ${selected?.id === sub.id ? 'is-selected' : ''}`} onClick={() => setSelectedId(sub.id)}><div className="desk-inbox-card-top"><span className="desk-small-avatar">{initials(sub.tip.contributorAlias || 'Source')}</span><span>{sub.tip.contributorAlias || 'Contributor'}</span></div><strong>{resultLabels(sub.analysis).inbox}</strong><div className="desk-inbox-card-bottom"><span className={`desk-state state-${sub.state}`}>{sub.state === 'ready' ? 'Ready to review' : sub.state === 'analyzing' ? 'Analyzing' : sub.state === 'failed' ? 'Needs attention' : 'Received'}</span><ArrowRight size={14} /></div></button>)}
-            <div className="desk-reference"><BookOpen size={17} /><button onClick={() => setInspected({ title: 'Invoice INV-204', label: 'Seeded reference · fictional record', text: INVOICE_TEXT })}>Invoice INV-204 <ArrowUpRight size={13} /></button></div>
+            <div className="desk-reference"><BookOpen size={17} /><button onClick={() => setInspected({ title: `Invoice ${DEMO_INVOICE.invoiceId}`, label: 'Seeded reference · fictional record', text: INVOICE_TEXT })}>Invoice {DEMO_INVOICE.invoiceId} <ArrowUpRight size={13} /></button><a href="/demo-invoice.pdf" target="_blank" rel="noreferrer" aria-label={`Invoice ${DEMO_INVOICE.invoiceId} PDF`}>PDF</a></div>
           </section>
           <section className="desk-case-panel">
             {selected ? <>

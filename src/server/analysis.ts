@@ -1,5 +1,5 @@
 import type {Analysis,Tip,RecipientProfile} from '../shared/contracts';
-import {INVOICE_TEXT} from '../shared/contracts';
+import {DEMO_INVOICE,INVOICE_TEXT} from '../shared/contracts';
 import {z} from 'zod';
 import {randomBytes} from 'node:crypto';
 
@@ -10,8 +10,10 @@ export function supportedAmounts(text:string){
  text=text.replace(/\r\n/g,'\n').replace(/^(Amount[ \t]+(?:sent|paid)|Payment[ \t]+amount|Invoice reference|Contract)[ \t]*:?[ \t]*\n[ \t]*([^\n]+)$/gim,(_match,label:string,value:string)=>`${label}: ${value}`);
  const matches=[...text.matchAll(/^[ \t]*(?:Amount[ \t]+(?:sent|paid)|Payment[ \t]+amount)[ \t]*:[ \t]*(?:USD[ \t]*|\$)?(\d+(?:,\d{3})*(?:\.\d{1,2})?)[ \t]*$/gim)];
  const amount=matches.length===1?Number(matches[0][1].replaceAll(',','')):null;
- const linked=/^Invoice reference:[ \t]*INV-204[ \t]*$/mi.test(text)&&/^Contract:[ \t]*K-17[ \t]*$/mi.test(text);
- return {invoiceAmount:120000,paymentAmount:linked&&amount!==null&&Number.isFinite(amount)&&amount>=0?amount:null};
+ const references=[...text.matchAll(/^[ \t]*Invoice reference:[ \t]*([^\n]*)$/gim)];
+ const contracts=[...text.matchAll(/^[ \t]*Contract:[ \t]*([^\n]*)$/gim)];
+ const linked=references.length===1&&contracts.length===1&&[DEMO_INVOICE.invoiceId,'INV-204'].includes(references[0][1].trim().toUpperCase())&&contracts[0][1].trim().toUpperCase()===DEMO_INVOICE.contract;
+ return {invoiceAmount:DEMO_INVOICE.amountDue,paymentAmount:linked&&amount!==null&&Number.isFinite(amount)&&amount>=0?amount:null};
 }
 export function extractJson(text:string){const cleaned=text.replace(/<think>[\s\S]*?<\/think>/g,'').replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();const start=cleaned.indexOf('{');const end=cleaned.lastIndexOf('}');return JSON.parse(cleaned.slice(start,end+1));}
 export function analysisProvider(){const requested=process.env.ANALYSIS_PROVIDER||'auto';return requested==='auto'?(process.env.TINFOIL_API_KEY?'tinfoil':'ollama'):requested;}
@@ -43,5 +45,5 @@ export async function analyzeTip(tip:Tip,profiles:RecipientProfile[],requestedPr
  const advice=adviceSchema.parse(extractJson(text));
  if(advice.recipientIds.some(id=>!profiles.some(p=>p.id===id)))throw new Error('The model returned an unsupported recipient. Retry analysis.');
  const {invoiceAmount,paymentAmount}=amounts;const difference=paymentAmount===null?null:paymentAmount-invoiceAmount;
- return {kind:difference===null?'insufficient_evidence':difference>0?'possible_overpayment':'no_supported_discrepancy',summary:difference===null?'The submitted text does not establish a payment amount linked to invoice INV-204 and contract K-17.':difference>0?`The payment record shows $${paymentAmount!.toLocaleString('en-US')} sent against a $120,000 invoice. The $${difference.toLocaleString('en-US')} difference needs an explanation.`:'This submitted payment does not exceed the $120,000 invoice. Further context may still be needed.',invoiceAmount,paymentAmount,difference,citations:[{documentId:'invoice-inv204',title:'Invoice INV-204',quote:INVOICE_TEXT},{documentId:'submitted-payment',title:tip.photoId?'Cindy’s reviewed photo transcript':'Cindy’s submitted payment record',quote:tip.evidenceText}],openQuestions:advice.openQuestions,recipientIds:advice.recipientIds,provider:provider as Analysis['provider'],model:provider==='deterministic-demo'?'No model · explicit fixture mode':model,durationMs:Date.now()-started,...(verification?{verification}:{})};
+ return {kind:difference===null?'insufficient_evidence':difference>0?'possible_overpayment':'no_supported_discrepancy',summary:difference===null?`The submitted text does not establish a payment amount linked to invoice ${DEMO_INVOICE.invoiceId} and contract ${DEMO_INVOICE.contract}.`:difference>0?`The payment record shows $${paymentAmount!.toLocaleString('en-US')} sent against a $${invoiceAmount.toLocaleString('en-US')} invoice. The $${difference.toLocaleString('en-US')} difference needs an explanation.`:`This submitted payment does not exceed the $${invoiceAmount.toLocaleString('en-US')} invoice. Further context may still be needed.`,invoiceAmount,paymentAmount,difference,citations:[{documentId:'invoice-inv204',title:`Invoice ${DEMO_INVOICE.invoiceId}`,quote:INVOICE_TEXT},{documentId:'submitted-payment',title:tip.photoId?'Cindy’s reviewed photo transcript':'Cindy’s submitted payment record',quote:tip.evidenceText}],openQuestions:advice.openQuestions,recipientIds:advice.recipientIds,provider:provider as Analysis['provider'],model:provider==='deterministic-demo'?'No model · explicit fixture mode':model,durationMs:Date.now()-started,...(verification?{verification}:{})};
 }

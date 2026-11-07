@@ -26,7 +26,7 @@ test('rejects unsupported expertise even with a real quote', () => {
   assert.throws(() => validateExtraction(data), /explicitly support/);
 });
 test('Cindy payment discrepancy prioritizes procurement and payments', () => {
-  const matches = matchRecipients('Invoice INV-204 was for $120,000 but the bank payment sent to the supplier was $350,000.');
+  const matches = matchRecipients('Invoice INV204 was for $120,000 but the bank payment sent to the supplier was $350,000.');
   assert.equal(matches[0], 'maya-chen');
   assert.deepEqual(matchRecipients('workers report unpaid overtime wages'), ['luis-rivera']);
 });
