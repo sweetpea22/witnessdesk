@@ -41,6 +41,7 @@ export default function PhotoInspector({ session, photo, contributorAlias, submi
       </div>
       <div className="desk-photo-details">
         <h2>Submitted photo</h2>
+        <p className="desk-model-label">Photo OCR · Ollama · <strong>{photo.model}</strong></p>
         <details className="desk-details"><summary>Photo details</summary><p>Ollama · {photo.model} · {(photo.durationMs / 1000).toFixed(1)}s</p><p>Image authenticity is unverified. The comparison uses the sender-reviewed text below.</p></details>
         <section className="desk-photo-section"><h3>Model description · unverified</h3><p>{photo.description || 'The model did not return a description.'}</p></section>
         <section className="desk-photo-section"><h3>Model uncertainty notes</h3>{photo.uncertainties.length ? <ul>{photo.uncertainties.map((note, index) => <li key={index}>{note}</li>)}</ul> : <p>None reported.</p>}</section>
