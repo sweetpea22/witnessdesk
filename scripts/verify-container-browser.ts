@@ -1,8 +1,11 @@
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import type { Browser, BrowserContext, FrameLocator, Page } from '@playwright/test';
+import type { Browser, BrowserContext, Download, FrameLocator, Locator, Page } from '@playwright/test';
 import { DEMO_CONTEXT, DEMO_EVIDENCE, INVOICE_TEXT } from '../src/shared/contracts';
+import type { InferenceVerification } from '../src/shared/contracts';
+import type { StoryPacket } from '../src/desk/story-packet';
 
 const usage = `Exercise the deployed Witness Desk production UI with fictional evidence.
 
@@ -16,11 +19,14 @@ Requires installed Playwright Chromium and the repository's supported Node versi
 
 This uses /preview, the production phone/desk UI, and the application's normal
 verified client. No source-module imports, provider stubs, TLS exceptions, or
-attestation bypasses are injected into the browser. Analysis must use Tinfoil.
+attestation bypasses are injected into the browser. Analysis and public reporter
+matching must use Tinfoil. Selected-recipient Markdown and JSON exports are
+checked against exact public sources, inference metadata, and SHA-256 hashes.
 The bootstrap check only checks configuration; it is not attestation evidence.
 Use scripts/verify-container.ts separately to export a verification document.
 
-Screenshots, the downloaded synthetic case brief, and a sanitized result go to
+Screenshots, the synthetic case brief, reviewed story packet, evidence manifest,
+and a sanitized result go to
 ignored artifacts/container-browser/<run>/. Only this run's fresh desk is reset.
 No browser storage, traces, network bodies, or raw error messages are recorded.
 `;
@@ -66,10 +72,34 @@ type Report = {
     attestationDocument: 'not-exported-by-this-browser-check';
   };
   checks: Record<string, boolean>;
+  publicStory?: { recipientId: string; recipientName: string; matchingModel: string; preparationProvider: string; sourceCount: number; markdownSha256: string };
   artifacts: string[];
   cleanup: { attempted: boolean; freshDeskReset: boolean };
   failure?: { stage: string; code: string };
 };
+
+async function downloadText(download: Download): Promise<string> {
+  requireCheck(await download.failure() === null, 'artifact-download-failed');
+  const stream = await download.createReadStream();
+  requireCheck(stream, 'artifact-download-unreadable');
+  const chunks: Buffer[] = [];
+  let bytes = 0;
+  for await (const chunk of stream) {
+    const buffer = Buffer.from(chunk);
+    bytes += buffer.length;
+    requireCheck(bytes <= 1_000_000, 'download-exceeds-expected-size');
+    chunks.push(buffer);
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+function requireInferenceMetadata(verification?: InferenceVerification) {
+  requireCheck(verification?.securityVerified === true, 'hosted-inference-verification-missing');
+  requireCheck(Number.isFinite(Date.parse(verification.verifiedAt)), 'hosted-inference-verification-time-invalid');
+  for (const value of [verification.configRepo, verification.enclaveHost, verification.releaseDigest, verification.codeFingerprint, verification.enclaveFingerprint]) {
+    requireCheck(typeof value === 'string' && value.length > 0 && value.length <= 1024 && !/[\r\n\u0000]/.test(value), 'hosted-inference-verification-metadata-invalid');
+  }
+}
 
 async function verify(options: NonNullable<ReturnType<typeof parseOptions>>, report: Report, directory: string) {
   let browser: Browser | undefined;
@@ -80,6 +110,13 @@ async function verify(options: NonNullable<ReturnType<typeof parseOptions>>, rep
   let stage = 'launch-browser';
   let ownsFreshDesk = false;
   let blockedInsecureRequest = false;
+
+  async function clickDownload(button: Locator) {
+    requireCheck(page, 'preview-page-unavailable');
+    const pending = page.waitForEvent('download', { timeout: 30_000 });
+    await button.click();
+    return downloadText(await pending);
+  }
 
   async function screenshot(filename: string) {
     if (!page || page.isClosed()) return;
@@ -203,6 +240,8 @@ async function verify(options: NonNullable<ReturnType<typeof parseOptions>>, rep
     report.checks.sourceQuoteInspectorsMatchEvidence = true;
 
     stage = 'inspect-recommended-recipient';
+    const demoRecipients = desk.getByText('Demo recipients', { exact: true });
+    if (await demoRecipients.count()) await demoRecipients.click();
     const maya = desk.locator('.desk-recipient-panel .desk-profile.is-recommended').filter({ hasText: 'Maya Chen' });
     await expect(maya).toHaveCount(1);
     await maya.click();
@@ -214,21 +253,7 @@ async function verify(options: NonNullable<ReturnType<typeof parseOptions>>, rep
     report.checks.mayaSelectedWithSourceProvenance = true;
 
     stage = 'download-synthetic-case-brief';
-    const downloading = page.waitForEvent('download', { timeout: 30_000 });
-    await desk.getByRole('button', { name: 'Download case brief', exact: true }).click();
-    const download = await downloading;
-    requireCheck(await download.failure() === null, 'case-brief-download-failed');
-    const stream = await download.createReadStream();
-    requireCheck(stream, 'case-brief-download-unreadable');
-    const chunks: Buffer[] = [];
-    let bytes = 0;
-    for await (const chunk of stream) {
-      const buffer = Buffer.from(chunk);
-      bytes += buffer.length;
-      requireCheck(bytes <= 1_000_000, 'case-brief-exceeds-expected-size');
-      chunks.push(buffer);
-    }
-    const brief = Buffer.concat(chunks).toString('utf8');
+    const brief = await clickDownload(desk.getByRole('button', { name: 'Download case brief', exact: true }));
     requireCheck(brief.startsWith('# Witness Desk case brief\n') && brief.includes(DEMO_EVIDENCE) && brief.includes(INVOICE_TEXT), 'case-brief-missing-synthetic-source-records');
     const original = brief.split('## Original desk analysis\n')[1]?.split('\n## Additional Tinfoil review')[0];
     requireCheck(original && /^\s*Provider: tinfoil\s*$/m.test(original), 'case-brief-original-provider-is-not-tinfoil');
@@ -240,9 +265,143 @@ async function verify(options: NonNullable<ReturnType<typeof parseOptions>>, rep
     report.artifacts.push('case-brief.md');
     report.checks.downloadedBriefMatchesOriginalAnalysis = true;
     report.checks.downloadedBriefIncludesHostedInferenceVerification = true;
+    await screenshot('06-completed-preview.png');
+
+    stage = 'match-public-reporters-with-tinfoil';
+    const seeds = JSON.parse(readFileSync(new URL('../fixtures/public-reporter-seeds.json', import.meta.url), 'utf8')) as {
+      reporters: Array<{ id: string; name: string; publication: string; cohortIds: string[]; sources: Array<{ id: string; url: string; excerpt: string }> }>;
+    };
+    requireCheck(Array.isArray(seeds.reporters) && seeds.reporters.length > 0, 'expected-public-reporter-seeds-unavailable');
+    const matches = desk.getByRole('region', { name: 'Public reporter matches', exact: true });
+    await matches.getByLabel('Match cohort', { exact: true }).selectOption('us-finance');
+    const matchButton = matches.getByRole('button', { name: 'Find matches with Tinfoil', exact: true });
+    await expect(matchButton).toBeEnabled();
+    await matchButton.click();
+    const matchDeadline = Date.now() + 150_000;
+    let matched = false;
+    while (Date.now() < matchDeadline) {
+      requireCheck(await matches.locator('.desk-match-error').count() === 0, 'hosted-public-reporter-matching-failed');
+      requireCheck(await matches.getByText('No supported matches.', { exact: true }).count() === 0, 'hosted-public-reporter-matching-returned-no-match');
+      if (await matches.locator('.desk-ranked-matches > li').count() > 0) { matched = true; break; }
+      await new Promise(resolve => setTimeout(resolve, Math.min(1_000, Math.max(0, matchDeadline - Date.now()))));
+    }
+    requireCheck(matched, 'public-matching-did-not-complete-within-150-seconds');
+    const matchingDetails = matches.locator('details.desk-details');
+    await matchingDetails.locator('summary').click();
+    await expect(matchingDetails).toContainText('Tinfoil');
+    await expect(matchingDetails).toContainText('Inference verified');
+    const names = await matches.locator('.desk-match-person strong').allTextContents();
+    requireCheck(names.length > 0 && new Set(names).size === names.length, 'matched-public-reporter-list-invalid');
+    const selected = seeds.reporters.find(reporter => reporter.name === names[0]);
+    requireCheck(selected && names.every(name => seeds.reporters.some(reporter => reporter.name === name && reporter.cohortIds.includes('us-finance'))), 'matched-reporter-outside-selected-public-cohort');
+    report.checks.hostedPublicReporterMatchUsesSelectedCohort = true;
+    await screenshot('07-tinfoil-public-matches.png');
+
+    stage = 'inspect-selected-public-reporter-sources';
+    const row = matches.locator('.desk-ranked-matches > li').first();
+    const sourceButtons = row.locator('.desk-match-sources button');
+    const sourceCount = await sourceButtons.count();
+    requireCheck(sourceCount > 0 && sourceCount <= 4, 'selected-public-reporter-has-no-supported-sources');
+    const expectedSources: Array<{ id: string; url: string; excerpt: string; retrievedAt: string }> = [];
+    for (let index = 0; index < sourceCount; index++) {
+      await sourceButtons.nth(index).click();
+      const inspector = desk.getByRole('dialog', { name: 'Source inspector', exact: true });
+      const details = inspector.locator('details');
+      await details.locator('summary').filter({ hasText: /^Source details$/ }).click();
+      const url = await details.locator('a.desk-public-link').getAttribute('href');
+      const source = selected.sources.find(source => source.url === url);
+      requireCheck(source && new URL(source.url).protocol === 'https:', 'public-source-url-does-not-belong-to-selected-reporter');
+      await expect(inspector.locator('.desk-inspector-document pre')).toHaveText(source.excerpt);
+      const retrievedAt = await details.locator('time').getAttribute('datetime');
+      requireCheck(retrievedAt && Number.isFinite(Date.parse(retrievedAt)), 'public-source-retrieval-time-missing');
+      expectedSources.push({ ...source, retrievedAt });
+      await screenshot(`08-public-source-${index + 1}.png`);
+      await inspector.getByRole('button', { name: 'Close source inspector', exact: true }).click();
+    }
+    requireCheck(new Set(expectedSources.map(source => source.url)).size === expectedSources.length, 'duplicate-public-source-in-selected-match');
+    report.checks.selectedReporterSourcesMatchExactPublicExcerpts = true;
+
+    stage = 'prepare-recipient-specific-story-packet';
+    const story = desk.locator('.desk-story-panel');
+    await story.locator(':scope > summary').click();
+    const recipient = story.getByLabel('Story packet recipient', { exact: true });
+    const optionIds = await recipient.locator('option').evaluateAll(elements => elements.map(element => (element as HTMLOptionElement).value).filter(Boolean));
+    requireCheck(optionIds.length === names.length && optionIds.every(id => seeds.reporters.some(reporter => reporter.id === id && names.includes(reporter.name))), 'story-packet-recipient-options-include-an-unmatched-reporter');
+    await recipient.selectOption(selected.id);
+    await story.locator('.desk-story-form').getByRole('button', { name: 'Prepare story packet', exact: true }).click();
+    const preview = story.getByRole('textbox', { name: 'Story packet preview', exact: true });
+    await expect(preview).toBeVisible();
+    const draft = await preview.inputValue();
+    const originalId = brief.match(/^Submission: ([a-f0-9-]{36})\s*$/m)?.[1];
+    const receivedAt = brief.match(/^Received: (\S+)/m)?.[1];
+    requireCheck(originalId && receivedAt, 'case-brief-intake-identifiers-unavailable-for-omission-check');
+    const privateFields = /readerSecret|senderCapability|witness-desk\.session|data:image\/|BEGIN (?:PGP )?PRIVATE KEY/i;
+    const metadataOmitted = (text: string) => !/\bCindy\b/i.test(text) && !text.includes(DEMO_CONTEXT) && !text.includes(originalId) && !text.includes(receivedAt) && !privateFields.test(text);
+    requireCheck(metadataOmitted(draft), 'story-draft-leaks-intake-identity-or-private-fields');
+    requireCheck(draft.includes(selected.name) && seeds.reporters.filter(reporter => reporter.id !== selected.id).every(reporter => !draft.includes(reporter.name)), 'story-draft-is-not-specific-to-selected-reporter');
+    requireCheck(draft.includes(INVOICE_TEXT) && draft.includes(DEMO_EVIDENCE), 'story-draft-does-not-preserve-exact-evidence');
+    for (const source of expectedSources) requireCheck(draft.includes(source.url) && draft.includes(source.excerpt), 'story-draft-does-not-preserve-matched-public-sources');
+    const packetDownload = story.getByRole('button', { name: 'Download story packet', exact: true });
+    const manifestDownload = story.getByRole('button', { name: 'Download evidence manifest', exact: true });
+    await expect(packetDownload).toBeDisabled();
+    await expect(manifestDownload).toBeDisabled();
+    const reviewed = draft + '\nOperator note: Verify the invoice reference before drawing conclusions.\n';
+    await preview.fill(reviewed);
+    await expect(story.getByText('Editing the preview does not redact the evidence manifest. Review its original records before downloading.', { exact: true })).toBeVisible();
+    const originalManifestPreview = story.locator('details').filter({ hasText: 'Preview original manifest evidence' });
+    await originalManifestPreview.locator('summary').click();
+    const originalManifestText = await originalManifestPreview.locator('pre').textContent();
+    requireCheck(originalManifestText, 'original-manifest-preview-unavailable');
+    const originalManifest = JSON.parse(originalManifestText) as { originalEvidence: Array<{ text: string }> };
+    requireCheck(originalManifest.originalEvidence.length === 2 && originalManifest.originalEvidence[0].text === INVOICE_TEXT && originalManifest.originalEvidence[1].text === DEMO_EVIDENCE, 'original-manifest-preview-does-not-preserve-records');
+    report.checks.manifestWarningAndOriginalEvidencePreviewVisible = true;
+    await screenshot('09-original-manifest-review.png');
+    await story.getByRole('checkbox', { name: 'I reviewed this story packet.', exact: true }).check();
+    await expect(packetDownload).toBeEnabled();
+    const markdown = await clickDownload(packetDownload);
+    const manifestText = await clickDownload(manifestDownload);
+    let manifest: StoryPacket['manifest'] & { operatorReviewedMarkdown: string; markdownSha256: string; hashAlgorithm: string; originalEvidencePreserved: boolean };
+    try { manifest = JSON.parse(manifestText); } catch { throw new BrowserVerificationFailure('downloaded-story-manifest-invalid-json'); }
+    requireCheck(markdown === reviewed && manifest.operatorReviewedMarkdown === reviewed, 'downloaded-story-does-not-match-reviewed-text');
+    const digest = createHash('sha256').update(markdown).digest('hex');
+    requireCheck(manifest.hashAlgorithm === 'SHA-256' && manifest.markdownSha256 === digest, 'story-manifest-hash-does-not-match-downloaded-markdown');
+    requireCheck(manifest.schemaVersion === 1 && manifest.kind === 'fictional-story-packet' && manifest.originalEvidencePreserved === true, 'downloaded-story-manifest-schema-invalid');
+    requireCheck(manifest.recipient.name === selected.name && manifest.recipient.publication === selected.publication, 'story-manifest-recipient-mismatch');
+    requireCheck(manifest.comparison.invoiceAmount === 120000 && manifest.comparison.paymentAmount === 350000 && manifest.comparison.difference === 230000, 'story-manifest-comparison-incorrect');
+    requireCheck(manifest.originalEvidence.length === 2 && manifest.originalEvidence[0].text === INVOICE_TEXT && manifest.originalEvidence[1].text === DEMO_EVIDENCE, 'story-manifest-altered-original-evidence');
+    requireCheck(manifest.chronology.map(item => item.date).join(',') === '2026-11-03,2026-11-05', 'story-manifest-document-chronology-incorrect');
+    requireCheck(manifest.publicSources.length === expectedSources.length, 'story-manifest-public-source-count-mismatch');
+    for (const source of manifest.publicSources) {
+      const expected = expectedSources.find(item => item.url === source.url);
+      requireCheck(expected && source.retrievedAt === expected.retrievedAt && source.quotes.length === 1 && source.quotes[0] === expected.excerpt, 'story-manifest-public-source-provenance-mismatch');
+      requireCheck(source.contentHash === createHash('sha256').update(expected.excerpt).digest('hex'), 'story-manifest-source-content-hash-mismatch');
+    }
+    const provenance = manifest.provenance;
+    requireCheck(provenance.originalAnalysis.provider === 'tinfoil' && provenance.matching.provider === 'tinfoil' && typeof provenance.matching.model === 'string' && provenance.matching.model.length > 0, 'story-manifest-providers-are-not-tinfoil');
+    requireInferenceMetadata(provenance.originalAnalysis.verification);
+    requireInferenceMetadata(provenance.matching.verification);
+    requireCheck(provenance.preparation.provider === 'darkbloom' && !!provenance.preparation.runId, 'story-manifest-public-preparation-provenance-missing');
+    requireCheck(metadataOmitted(markdown) && metadataOmitted(manifestText), 'downloaded-story-leaks-intake-identity-or-private-fields');
+    // Compare credentials inside the browser; return only a boolean, never storage values.
+    const noAuthIds = await story.evaluate((_element, text) => {
+      const session = JSON.parse(localStorage.getItem('witness-desk.session.v1') || 'null');
+      return !!session && [session.sessionId, session.readerSecret, session.senderCapability].every(value => typeof value === 'string' && value.length > 0 && !text.includes(value));
+    }, markdown + '\n' + manifestText);
+    requireCheck(noAuthIds, 'downloaded-story-contains-original-session-capabilities');
+    requireCheck(manifest.limits.recipientContacted === false && manifest.limits.syntheticCase === true, 'story-manifest-onward-delivery-or-case-label-invalid');
+    await writeFile(directory + 'selected-reporter-story.md', markdown, { mode: 0o600, flag: 'wx' });
+    await writeFile(directory + 'selected-reporter-evidence.json', manifestText, { mode: 0o600, flag: 'wx' });
+    report.artifacts.push('selected-reporter-story.md', 'selected-reporter-evidence.json');
+    report.publicStory = { recipientId: selected.id, recipientName: selected.name, matchingModel: provenance.matching.model,
+      preparationProvider: provenance.preparation.provider, sourceCount: expectedSources.length, markdownSha256: digest };
+    report.checks.hostedPublicMatchingVerificationMetadata = true;
+    report.checks.reviewGatedStoryDownloadsMatchManifestHash = true;
+    report.checks.storyPacketPreservesExactEvidenceAndSources = true;
+    report.checks.storyPacketOmitsIntakeIdentityAndAuthIds = true;
+    report.checks.storyPacketWasNotSentOnward = true;
     requireCheck(!blockedInsecureRequest, 'insecure-network-request-blocked');
     report.checks.httpsOnlyWithoutTlsExceptions = true;
-    await screenshot('06-completed-preview.png');
+    await screenshot('10-reviewed-public-story-packet.png');
 
     stage = 'reset-own-demo-desk';
     await resetFreshDesk();

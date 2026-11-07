@@ -2,11 +2,16 @@
 
 Updated 2026-11-07. The application source and AMD64 GHCR image are private. The user approved the separate [public configuration repository](https://github.com/sweetpea22/localpoast-tinfoil-config), which now contains only configuration, validation, release workflows, and documentation with independent Git history. This deployment supports a **text-only enclave demo**; the working phone photo demonstration continues on the laptop.
 
-The successful [private image build](https://github.com/sweetpea22/localpoast/actions/runs/42407644582) used source commit `76c1df7ccce1eccfc15f7c69985c626a2e7c8bbe`. The image is `ghcr.io/sweetpea22/localpoast@sha256:a444a506749aac00571e0ab2f88c0f8d82f670ce3a54ebbf7f9791b6db19c4e5` with tag `v0.0.1`. GitHub's package API confirms visibility `private`. Both config copies pin that exact digest and identify the separate public repository `sweetpea22/localpoast-tinfoil-config`.
+The successful [private image build](https://github.com/sweetpea22/localpoast/actions/runs/42413183148) used source commit `864debdf17d1c0b6c33e3fabb3be80854c9d0412`. The image is `ghcr.io/sweetpea22/localpoast@sha256:36bf4172389cd9320cdba1a1bf7ad7231aa2357ba76e2cd5c2794da516090e72` with tag `v0.0.2`. GitHub's package API confirms visibility `private`. Both config copies pin that exact digest and identify the separate public repository `sweetpea22/localpoast-tinfoil-config`. Public config commit `336017aa5dbaa78d9734ec10b199112ef60ea329` produced [release v0.0.4](https://github.com/sweetpea22/localpoast-tinfoil-config/releases/tag/v0.0.4) through [publication run 42413328054](https://github.com/sweetpea22/localpoast-tinfoil-config/actions/runs/42413328054).
 
-**Verified deployment: PASS, November 7 at 20:14 UTC.** [Config v0.0.3](https://github.com/sweetpea22/localpoast-tinfoil-config/releases/tag/v0.0.3) is running at [the hosted preview](https://localpoast.janedoe.containers.tinfoil.dev/preview). Debug mode is off and confidential computing is enabled. The CLI verified the exact release before receiving `{"ok":true}` from `/health`. The Node SDK then verified the app enclave and completed encrypted submission, sender-read rejection, cited amount comparison, verified Tinfoil inference, Darkbloom graph validation, and session reset. A separate production Chromium flow passed review/send, source inspectors, Maya's profile, case-brief download, and reset.
+**Verified deployment: PASS, November 7 at 20:57 UTC.** Config **v0.0.4** has been running since `20:56:57Z` at [the hosted preview](https://localpoast.janedoe.containers.tinfoil.dev/preview). Debug mode is off and confidential computing is enabled. The CLI verified the exact release before receiving `{"ok":true}` from `/health`. The Node SDK verified the app enclave and completed encrypted submission, sender-read rejection, cited amount comparison, verified Tinfoil inference, original demo-profile provenance, and session reset.
 
-The app verification reports release digest `db08ed432a9ad74872c0f411f43dfb8dec63608709656c13c2239493094b72a5`, matching code/enclave fingerprints, and an attested HPKE key. Inference used `llama3-3-70b` in 2,982 ms. Sanitized reports and screenshots are retained locally under ignored `artifacts/container-verification/` and `artifacts/container-browser/`. This verifies a browser-based text flow; a physical phone on this hosted URL has not yet been checked.
+Production Chromium passed **all 18 checks** at `20:57:33.146Z`, including the selected finance cohort's actual Tinfoil reporter match, Jeff Ernsthausen's two exact supporting sources, editable story-packet review, Markdown and JSON downloads with a matching SHA-256, the manifest warning and original-evidence preview, omission of intake identity/auth data, and reset. No packet was sent onward. This verifies the hosted text flow; a physical phone on this URL, demo video, and event submission have not yet been checked.
+
+The app verification reports release digest `fe12be0c8fe9e6821ee07106177f97f53591e458f90a3a418f480374b012d9af`, matching code/enclave fingerprints, and an attested HPKE key. Original inference used `llama3-3-70b` in **3,379 ms**. Sanitized evidence is retained in ignored local files:
+
+- `artifacts/container-verification/verify-2026-11-07T20-57-12-844Z-25ca4940.json`: SDK attestation, encrypted API, and inference checks.
+- `artifacts/container-browser/2026-11-07T20-57-12-471Z-39d6912e/result.json`: all 18 browser checks; screenshots and downloaded story artifacts are in the same directory.
 
 ## Files and visibility
 
@@ -29,7 +34,7 @@ Organization-admin authentication works. Project-scoped `TINFOIL_API_KEY` and `D
 
 Both measured-release workflows succeeded for [config v0.0.1](https://github.com/sweetpea22/localpoast-tinfoil-config/releases/tag/v0.0.1). The first two enclave boots passed CPU attestation and certificate setup but failed at the private-image pull because of the upstream runtime defect below. These were not credential-validation or capacity failures.
 
-Both config copies and the local validator require **CVM 0.14.9**. Config release `v0.0.2` fixed the private-image pull; the next startup check exposed a missing `DOMAIN` pass-through. Public config commit `00604cd` corrected it, and the [v0.0.3 measured-publication workflow](https://github.com/sweetpea22/localpoast-tinfoil-config/actions/runs/42409857727) succeeded. A local differential test confirmed that omitting the value caused exit code 1 and passing it produced a healthy app. The corrected enclave passed every boot stage and the live checks described above.
+Both config copies and the local validator require **CVM 0.14.9**. Historically, config release `v0.0.2` fixed the private-image pull; the next startup check exposed a missing `DOMAIN` pass-through. Public config commit `00604cd` corrected it, and the [v0.0.3 measured-publication workflow](https://github.com/sweetpea22/localpoast-tinfoil-config/actions/runs/42409857727) succeeded. A local differential test confirmed that omitting the value caused exit code 1 and passing it produced a healthy app. Current config **v0.0.4** preserves both fixes and updates the image to include public-reporter matching and reviewed story packets.
 
 The CLI does not automatically read this project's `.env`. Session commands parse its current `TINFOIL_ADMIN_KEY` into a child environment, remove `TINFOIL_API_KEY` from that child, and set `TINFOIL_CONFIG=/tmp/localpoast-empty-tinfoil-context.json` to exclude an old saved login. Never print credentials or pass literal values in command-line arguments. The administration key is never injected into the runtime image. [CLI authentication](https://docs.tinfoil.sh/containers/cli#authenticating)
 
@@ -47,7 +52,7 @@ The root filesystem remains read-only. Bounded tmpfs mounts provide 128 MB at `/
 
 Tinfoil supplies its reserved `DOMAIN` value in external configuration. The container must explicitly request it with the bare string `- DOMAIN` in its `env` list; this passes through the platform value without defining a literal override. CVM 0.14.9 only copies requested names, as shown in its [environment-building implementation](https://github.com/tinfoilsh/cvmimage/blob/v0.14.9/tinfoil/internal/containers/containers.go#L714). The measured shell entrypoint derives `TINFOIL_CONTAINER_URL` and `PUBLIC_ORIGIN` from it before launching the unchanged application. It refuses an empty or malformed domain. The public config supplies the separate config-repository name. Never supply a custom literal value for `DOMAIN`. [Environment documentation](https://docs.tinfoil.sh/containers/secrets-and-env-vars)
 
-`ANALYSIS_PROVIDER=tinfoil` sends submitted text through the app's existing Tinfoil SDK adapter. Darkbloom receives only the synthetic portfolio corpus. The config explicitly permits **outbound public-network access**: the installed SDK contacts `atc.tinfoil.sh` and discovers a verified router hostname, while Darkbloom uses `api.darkbloom.dev`. This is not a hostname-restricted network. A narrower policy requires capturing the complete verified SDK endpoint set, including redirects, and retesting; wildcard allowlist entries are unsupported. [Networking reference](https://docs.tinfoil.sh/containers/config-networking)
+`ANALYSIS_PROVIDER=tinfoil` sends submitted text through the app's existing Tinfoil SDK adapter. Hosted public-reporter matching also uses verified Tinfoil inference. Darkbloom receives only the public reporter source corpus or the separate synthetic demo portfolios; it does not receive private case evidence. The config explicitly permits **outbound public-network access**: the installed SDK contacts `atc.tinfoil.sh` and discovers a verified router hostname, while Darkbloom uses `api.darkbloom.dev` and source refresh fetches allowlisted official newsroom pages. This is not a hostname-restricted network. A narrower policy requires capturing the complete verified SDK endpoint set, including redirects, and retesting; wildcard allowlist entries are unsupported. [Networking reference](https://docs.tinfoil.sh/containers/config-networking)
 
 The browser's existing `SecureClient` uses the enclave URL and config repo before sending app requests. The initial web-page/bootstrap delivery is still ordinary HTTPS; this deployment does not claim independently verified browser code delivery. Confirm a real attested request before treating the Container mode badge as execution evidence. [Connecting documentation](https://docs.tinfoil.sh/containers/connecting)
 
@@ -55,7 +60,7 @@ The browser's existing `SecureClient` uses the enclave URL and config repo befor
 
 The current photo adapter only calls Ollama on loopback. The Docker image includes neither Ollama nor `qwen2.5vl:3b`; loopback inside the enclave cannot reach the laptop. The photo action will therefore fail there. Changing `OLLAMA_URL` to a remote service is rejected by the current adapter and would not make that service local.
 
-For this checkpoint, demonstrate the real photo → local vision → reviewed text flow on the laptop. Demonstrate the enclave separately using Cindy's supplied text record, Tinfoil text analysis, and the cached/live Darkbloom recipient graph. Do not present the enclave as a working hosted photo demo. Before offering the full hosted flow, implement and test a deliberate confidential vision adapter or a properly provisioned in-enclave model runtime, and make the UI describe its actual execution location. That application work is outside these deployment artifacts.
+For this checkpoint, demonstrate the real photo → local vision → reviewed text flow on the laptop. Demonstrate the enclave using Cindy's supplied text record, Tinfoil text analysis and reporter matching, the Darkbloom-prepared public network, and the reviewed story packet. Do not present the enclave as a working hosted photo demo. Before offering the full hosted flow, implement and test a deliberate confidential vision adapter or a properly provisioned in-enclave model runtime, and make the UI describe its actual execution location. That application work is outside these deployment artifacts.
 
 ## Repeatable release and verification commands
 
@@ -78,7 +83,7 @@ python3 -m venv /tmp/localpoast-tinfoil-validation
 
 The dedicated GHCR pull token belongs in the organization's Registry Credentials, not the public config, application image, or runtime secret list. Runtime delivery is limited to project-scoped `TINFOIL_API_KEY` and `DARKBLOOM_API_KEY`. To update secrets, use the dashboard or `tinfoil repo secret set OWNER/CONFIG_REPO NAME --value-file /protected/file`; never literal secret arguments. Managed secret delivery is visible to Tinfoil infrastructure during deployment. `.dockerignore` excludes `.env` and `.env.*`. [Secrets documentation](https://docs.tinfoil.sh/containers/secrets-and-env-vars)
 
-For a future config release, use a new unused version and wait for both release workflows and the actual GitHub release. `v0.0.3` is already dispatched; do not dispatch it again:
+For a future config release, replace `NEW_CONFIG_VERSION` with a new unused version and wait for both release workflows and the actual GitHub release. **v0.0.4 is already running; do not republish it.**
 
 ```sh
 LOCALPOAST_CONFIG_REPO='sweetpea22/localpoast-tinfoil-config'
@@ -87,18 +92,18 @@ tinfoil repo build status "$LOCALPOAST_CONFIG_REPO" --version NEW_CONFIG_VERSION
 tinfoil repo build info "$LOCALPOAST_CONFIG_REPO"
 ```
 
-After confirming the actual GitHub release for corrected config `v0.0.3`, deploy the existing failed instance with debug mode off. For later changes to a running instance, use `container update` instead of `container deploy`:
+After reviewing and confirming the new GitHub release, update the existing running instance with debug mode off:
 
 ```sh
-tinfoil container deploy localpoast --tag v0.0.3 --debug=false --mark-latest=false
+tinfoil container update localpoast --tag NEW_CONFIG_VERSION --debug=false --mark-latest=false
 tinfoil container get localpoast
 ```
 
-Copy the actual instance hostname from `container get`, verify `/health` against the exact released tag, then exercise the browser text-submission flow and inspect its actual provider results:
+Copy the actual instance hostname from `container get`, verify `/health` against that exact released tag, then exercise the browser text-submission and story-packet flow. To recheck the current deployment, use `v0.0.4` in place of `NEW_CONFIG_VERSION`:
 
 ```sh
 LOCALPOAST_ENCLAVE_HOST='ACTUAL_HOST_FROM_CONTAINER_GET'
-tinfoil http get -e "$LOCALPOAST_ENCLAVE_HOST" -r "$LOCALPOAST_CONFIG_REPO@v0.0.3" "https://$LOCALPOAST_ENCLAVE_HOST/health"
+tinfoil http get -e "$LOCALPOAST_ENCLAVE_HOST" -r "$LOCALPOAST_CONFIG_REPO@NEW_CONFIG_VERSION" "https://$LOCALPOAST_ENCLAVE_HOST/health"
 ```
 
 Plain curl establishes reachability only. Stop the demo instance when finished; stopping loses its in-memory evidence. [Quickstart](https://docs.tinfoil.sh/containers/quickstart), [Image-build instructions](https://docs.tinfoil.sh/containers/building-images)
