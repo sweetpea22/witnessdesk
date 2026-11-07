@@ -16,7 +16,7 @@ async function pairPhone(desk: Page, phone: Page): Promise<Pairing> {
   expect(pairing.senderCapability).toBeTruthy();
   expect(parameters.has('reader')).toBe(false);
   await phone.goto(`/contribute${hash}`);
-  await expect(phone.getByText('Connected to Witness Desk', { exact: true })).toBeVisible();
+  await expect(phone.locator('.contributor-form')).toHaveAttribute('aria-busy', 'false');
   await expect(phone).toHaveURL(/\/contribute$/);
   await desk.getByRole('button', { name: 'Close pairing' }).click();
   return pairing;
@@ -66,16 +66,16 @@ test('unsupported and malformed photos stay on the phone without an inference re
     phone.on('request', request => {
       if (new URL(request.url()).pathname === '/api/secure' && request.method() === 'POST') secureRequests++;
     });
-    await phone.getByRole('textbox', { name: 'The evidence' }).fill('Keep this draft while I check the photograph.');
+    await phone.getByRole('textbox', { name: 'Evidence' }).fill('Keep this draft while I check the photograph.');
     const choose = phone.getByLabel('Choose photo', { exact: true });
     await choose.setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('This is not a photograph.') });
     await expect(phone.getByRole('alert')).toContainText('Choose an image file.');
-    await expect(phone.getByRole('textbox', { name: 'The evidence' })).toHaveValue('Keep this draft while I check the photograph.');
+    await expect(phone.getByRole('textbox', { name: 'Evidence' })).toHaveValue('Keep this draft while I check the photograph.');
     expect(secureRequests).toBe(0);
 
     await choose.setInputFiles({ name: 'broken.jpg', mimeType: 'image/jpeg', buffer: Buffer.from('not-a-decodable-jpeg') });
     await expect(phone.getByRole('alert')).toContainText('This browser could not open that image.');
-    await expect(phone.getByRole('textbox', { name: 'The evidence' })).toHaveValue('Keep this draft while I check the photograph.');
+    await expect(phone.getByRole('textbox', { name: 'Evidence' })).toHaveValue('Keep this draft while I check the photograph.');
     expect(secureRequests).toBe(0);
   } finally { await phoneContext.close(); }
 });
@@ -108,30 +108,29 @@ test('Cindy reviews a real local vision description and submits an encrypted pho
     });
 
     await test.step('A real image is described by the local vision model', async () => {
-      await phone.getByRole('textbox', { name: 'Your alias' }).fill('Cindy');
-      await phone.getByRole('textbox', { name: 'What should we know?' }).fill(DEMO_CONTEXT);
+      await phone.getByRole('textbox', { name: 'Context optional' }).fill(DEMO_CONTEXT);
       await phone.getByLabel('Choose photo', { exact: true }).setInputFiles({ name: 'PAY-882.png', mimeType: 'image/png', buffer: fixture });
-      await expect(phone.getByRole('button', { name: 'Describe photo', exact: true })).toBeEnabled();
-      await phone.getByRole('button', { name: 'Describe photo', exact: true }).click();
+      await expect(phone.getByRole('button', { name: 'Describe on laptop', exact: true })).toBeEnabled();
+      await phone.getByRole('button', { name: 'Describe on laptop', exact: true }).click();
       await expect(phone.locator('.contributor-photo-description')).toBeVisible({ timeout: 240_000 });
-      await expect(phone.locator('.contributor-photo-description')).toContainText('What the model sees');
-      await expect(phone.getByRole('textbox', { name: 'The evidence' })).toHaveValue(/350[\s,]?000/, { timeout: 240_000 });
+      await expect(phone.locator('.contributor-photo-description')).toContainText('Description');
+      await expect(phone.getByRole('textbox', { name: 'Evidence' })).toHaveValue(/350[\s,]?000/, { timeout: 240_000 });
       await capture(phone, testInfo, 'phone-real-vision-description');
     });
 
     let reviewedText = '';
     await test.step('Cindy edits the extracted evidence before approving it', async () => {
-      const evidence = phone.getByRole('textbox', { name: 'The evidence' });
+      const evidence = phone.getByRole('textbox', { name: 'Evidence' });
       const extracted = await evidence.inputValue();
       expect(extracted).toMatch(/350[\s,]?000/);
       reviewedText = `${extracted}\n\n${reviewedAddition}`;
       await evidence.fill(reviewedText);
-      await phone.getByRole('button', { name: 'Review your submission' }).click();
+      await phone.getByRole('button', { name: 'Review' }).click();
       await expect(phone.locator('.contributor-document pre')).toHaveText(reviewedText);
       await expect(phone.locator('.contributor-review-photo img')).toBeVisible();
       await capture(phone, testInfo, 'phone-photo-review');
-      await phone.getByRole('button', { name: 'Send to Witness Desk' }).click();
-      await expect(phone.getByRole('heading', { name: 'Thank you, Cindy.' })).toBeVisible();
+      await phone.getByRole('button', { name: 'Send' }).click();
+      await expect(phone.getByRole('heading', { name: 'Received' })).toBeVisible();
       expect(wireRecords.length).toBeGreaterThanOrEqual(2);
       for (const wire of wireRecords) {
         expect(wire.path).toBe('/api/secure');

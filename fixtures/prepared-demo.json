@@ -20,6 +20,11 @@
           "specialty": "Local government",
           "sourceId": "maya-oversight",
           "quote": "Maya Chen covers Local government and Procurement."
+        },
+        {
+          "specialty": "Procurement",
+          "sourceId": "maya-oversight",
+          "quote": "Maya Chen covers Local government and Procurement."
         }
       ]
     },
@@ -36,6 +41,11 @@
           "specialty": "Worker safety",
           "sourceId": "luis-safety",
           "quote": "Luis Rivera covers Worker safety and Labor."
+        },
+        {
+          "specialty": "Labor",
+          "sourceId": "luis-safety",
+          "quote": "Luis Rivera covers Worker safety and Labor."
         }
       ]
     },
@@ -50,6 +60,16 @@
         },
         {
           "specialty": "Environment",
+          "sourceId": "priya-water",
+          "quote": "Priya Shah investigates Water quality and Environment."
+        },
+        {
+          "specialty": "Environment",
+          "sourceId": "priya-enforcement",
+          "quote": "Priya Shah covers Environment and Local government."
+        },
+        {
+          "specialty": "Local government",
           "sourceId": "priya-enforcement",
           "quote": "Priya Shah covers Environment and Local government."
         }
@@ -58,12 +78,12 @@
   ],
   "report": {
     "state": "ready",
-    "provider": "ollama",
-    "model": "llama3:8b",
-    "startedAt": "2026-11-07T18:43:28.495Z",
-    "runId": "cc04b6fd-7c7d-4faa-a4b7-ccb22893467b",
+    "provider": "darkbloom",
+    "model": "gemma-4-26b",
+    "startedAt": "2026-11-07T19:18:12.700Z",
+    "runId": "7d6c6560-b30d-4eb9-9b49-f418c03cda37",
     "sourceCount": 6,
     "profileCount": 3,
-    "completedAt": "2026-11-07T18:43:49.409Z"
+    "completedAt": "2026-11-07T19:18:16.304Z"
   }
 }

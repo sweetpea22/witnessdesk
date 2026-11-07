@@ -17,18 +17,18 @@ Open http://localhost:5173/preview for phone and desk together, /desk for the la
 
 For an actual phone, run `cloudflared tunnel --url http://localhost:5173`, put its HTTPS URL in `PUBLIC_ORIGIN` in `.env`, and restart the dev server. On the laptop choose **Connect a phone**, then scan the QR. The app strips the sender capability from the visible URL and keeps it in the phone tab's session storage. A direct `/contribute` visit asks for pairing. `/preview` deliberately pairs its simulated phone to its own desk.
 
-Load Cindy's fictional payment record, review, and submit. The desk already holds invoice INV-204 for $120,000. Submitted payment PAY-882 is $350,000. The app parses that narrow fixture format and computes the $230,000 difference; the local model proposes follow-up questions and chooses a source-backed recipient. Changing the payment amount changes the result. Ambiguous or unlinked amounts produce insufficient evidence. Photo capture/upload and local vision interpretation are now available; text remains an editable fallback.
+Paste or photograph Cindy's fictional payment record, review, and submit. The desk already holds invoice INV-204 for $120,000. Submitted payment PAY-882 is $350,000. The app parses that narrow fixture format and computes the $230,000 difference; the local model proposes follow-up questions and chooses a source-backed recipient. Changing the payment amount changes the result. Ambiguous or unlinked amounts produce insufficient evidence. Photo capture/upload and local vision interpretation are now available; text remains an editable fallback.
 
 Ollama must be running with `llama3:8b` (or change `OLLAMA_MODEL` to another installed model). Both local analysis and local graph preparation require a loopback Ollama endpoint. `ANALYSIS_PROVIDER=ollama` keeps tips local. Choose `tinfoil` explicitly and configure `TINFOIL_API_KEY` to use confidential hosted inference. A key does not deploy the app into a Container.
 
 The local recipient pipeline reads articles in fixtures, asks a local Ollama model to extract expertise with exact supporting quotes, validates the quotations, then constructs recipient/article/topic/region relationships. Open the recipient graph to inspect its sources. Darkbloom is a separate adapter; Ollama execution is never labeled as Darkbloom use.
 
-Read [the complete source-to-graph flow](src/recipients/README.md). The checked-in preparation cache is the output of an actual local model run over six fictional articles. The network view can rerun preparation. It displays provider, model, run time, and sources. Private matching uses those validated profiles; the tip is never an input to public-corpus preparation.
+Read [the complete source-to-graph flow](src/recipients/README.md). The checked-in preparation cache now contains the successful Darkbloom run over six fictional articles; the earlier local-model run was also verified. The network view can rerun preparation. It displays provider, model, run time, and sources. Private matching uses those validated profiles; the tip is never an input to public-corpus preparation.
 
 ## Photo and vision flow
 
 1. Choose **Take a photo** or **Choose photo**. The browser prepares a JPEG copy with a maximum edge of 1800 pixels and removes original file metadata. Unsupported formats can be exported as JPEG or a screenshot.
-2. Tap **Describe photo**. An encrypted request sends the resized image to this laptop's `qwen2.5vl:3b` model. This is a separate, explicit processing step before submission; it does not run on the phone.
+2. Tap **Describe on laptop**. An encrypted request sends the resized image to this laptop's `qwen2.5vl:3b` model. This is a separate, explicit processing step before submission; it does not run on the phone.
 3. Review the factual image description, uncertainty notes, and extracted document text. Edit the text before submitting. For scene photographs with no readable text, explicitly choose **Use description as evidence** or write what you observed.
 4. Confirm the submission. The desk receives the model output separately from the reviewed text. **View submitted photo** loads the image through reader-only encrypted access; routine desk polling carries no image bodies.
 

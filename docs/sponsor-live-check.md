@@ -40,9 +40,9 @@ Only presence was checked; credential values and configuration addresses were no
 
 No Container was created or deployed, and no repository or configuration was published. This successful inference request does **not** demonstrate the Container deployment required by the Tinfoil track described in [sponsor execution evidence](sponsor-evidence.md). Containers-enabled organization access, deployment configuration, a live instance, and a verified application request remain unverified.
 
-## Darkbloom: model access works, execution rejected
+## Darkbloom: successful after credits were added
 
-At 19:09:38 UTC the authenticated model listing succeeded (HTTP 200), including `gemma-4-26b`. A real fixed-corpus preparation request using that model was rejected with HTTP 402 before any successful extraction. Check the account's execution access or credits. The app retained its previously validated Ollama profiles; no Darkbloom success was recorded. Run ID: `140264ed-c0dc-436d-96fc-4c21faa34612`.
+A real fixed-corpus preparation run with `gemma-4-26b` succeeded in 3,605 ms at 19:18:16 UTC. Six articles produced three validated profiles, 19 nodes, and 20 edges. The running desk loaded the output and selected Maya for Cindy's $230,000 discrepancy. See [the execution report](darkbloom-live-check.md). The earlier HTTP 402 account issue is resolved.
 
 ## Local photo interpretation: successful
 

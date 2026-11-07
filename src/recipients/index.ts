@@ -139,8 +139,7 @@ function parseJson(text: string): unknown {
 }
 
 async function requestExtraction(provider: Exclude<Provider, 'fixture'>): Promise<{ extracted: Extracted[]; model: string }> {
-  const model = provider === 'ollama' ? (process.env.OLLAMA_MODEL || 'llama3:8b') : process.env.DARKBLOOM_MODEL;
-  if (!model) throw new Error('Configure DARKBLOOM_MODEL before preparing profiles.');
+  const model = provider === 'ollama' ? (process.env.OLLAMA_MODEL || 'llama3:8b') : (process.env.DARKBLOOM_MODEL || 'gemma-4-26b');
   const messages = [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: promptCorpus() }];
   let result: unknown;
   if (provider === 'ollama') {
@@ -165,9 +164,9 @@ async function requestExtraction(provider: Exclude<Provider, 'fixture'>): Promis
       }
     }
   } else {
-    const base = process.env.DARKBLOOM_BASE_URL;
+    const base = process.env.DARKBLOOM_BASE_URL || 'https://api.darkbloom.dev/v1';
     const key = process.env.DARKBLOOM_API_KEY;
-    if (!base || !key) throw new Error('Configure DARKBLOOM_BASE_URL and DARKBLOOM_API_KEY before preparing profiles.');
+    if (!key) throw new Error('Configure DARKBLOOM_API_KEY before preparing profiles.');
     const url = new URL(base.replace(/\/$/, '') + '/chat/completions');
     if (url.protocol !== 'https:') throw new Error('Darkbloom API access requires HTTPS.');
     const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
@@ -186,7 +185,7 @@ export function prepareRecipientProfiles(options: { provider?: Provider } = {}):
   if (activeJob) return activeJob;
   const provider = options.provider || 'ollama';
   const runId = randomUUID();
-  report = { state: 'working', provider, model: provider === 'ollama' ? (process.env.OLLAMA_MODEL || 'llama3:8b') : provider === 'darkbloom' ? (process.env.DARKBLOOM_MODEL || 'not configured') : 'curated demo fixtures', startedAt: new Date().toISOString(), runId, sourceCount: 6, profileCount: 3 };
+  report = { state: 'working', provider, model: provider === 'ollama' ? (process.env.OLLAMA_MODEL || 'llama3:8b') : provider === 'darkbloom' ? (process.env.DARKBLOOM_MODEL || 'gemma-4-26b') : 'curated demo fixtures', startedAt: new Date().toISOString(), runId, sourceCount: 6, profileCount: 3 };
   activeJob = (async () => {
     // Yield before even a fixture-only run so the active promise is assigned
     // before finally clears it.
