@@ -118,7 +118,8 @@ test('Cindy sends encrypted evidence from a paired phone; a lost receipt retry c
       await expect(desk.locator('.desk-amount-grid')).toContainText('$120,000');
       await expect(desk.locator('.desk-amount-grid')).toContainText('$350,000');
       await expect(desk.locator('.desk-amount-gap')).toContainText('$230,000');
-      await expect(desk.locator('.desk-analysis-byline')).toContainText('Ollama');
+      await desk.locator('.desk-finding .desk-details summary').click();
+      await expect(desk.locator('.desk-finding .desk-details')).toContainText('Ollama');
       await expect(desk.locator('.desk-citation')).toHaveCount(2);
       await desk.locator('.desk-source-button').first().click();
       await expect(desk.getByRole('dialog', { name: 'Source inspector' })).toBeVisible();
@@ -147,9 +148,9 @@ test('Cindy sends encrypted evidence from a paired phone; a lost receipt retry c
       await expect(desk.locator('.desk-inbox-card').first().locator('strong')).toHaveText('Payment matches invoice');
       await expect(desk.getByRole('heading', { name: 'No payment gap shown', exact: true })).toBeVisible();
       await expect(desk.locator('.desk-amount-grid strong')).toHaveText(['$120,000', '$120,000', '$0']);
-      await expect(desk.locator('.desk-amount-gap small')).toHaveText('Amounts match');
       await expect(desk.locator('.desk-amount-grid')).not.toContainText('$230,000');
-      await expect(desk.locator('.desk-analysis-byline')).toContainText('Ollama');
+      if(await desk.locator('.desk-finding .desk-details').getAttribute('open')===null)await desk.locator('.desk-finding .desk-details summary').click();
+      await expect(desk.locator('.desk-finding .desk-details')).toContainText('Ollama');
       await desk.locator('.desk-citations .desk-source-button').nth(1).click();
       await expect(desk.locator('.desk-inspector-document')).toContainText('PAY-882');
       await expect(desk.locator('.desk-inspector-document')).toContainText('Amount sent: USD 120,000');

@@ -21,6 +21,10 @@ Paste or photograph Cindy's fictional payment record, review, and submit. The de
 
 Ollama must be running with `llama3:8b` (or change `OLLAMA_MODEL` to another installed model). Both local analysis and local graph preparation require a loopback Ollama endpoint. `ANALYSIS_PROVIDER=ollama` keeps tips local. Choose `tinfoil` explicitly and configure `TINFOIL_API_KEY` to use confidential hosted inference. A key does not deploy the app into a Container.
 
+With a configured Tinfoil key, the desk also offers **Review with Tinfoil** after the initial analysis. This is an explicit additional request: reviewed evidence text, contributor context, the seeded invoice, and recipient expertise go to Tinfoil; the image is not sent. The SDK verifies the inference enclave before sending the prompt. The result retains its verification metadata, model, questions, and recipient recommendation separately from the initial local result. Repeated clicks reuse the review, and verification/provider failures leave the local findings available. This verifies the inference service, not deployment of this app as a Tinfoil Container.
+
+**Download case brief** saves a Markdown file on the desk operator's computer with source quotes, amounts, model provenance, and recipient supporting sources. It includes completed Tinfoil verification metadata when available. It does not send anything to a recipient or include photo bytes, pairing links, or access capabilities.
+
 The local recipient pipeline reads articles in fixtures, asks a local Ollama model to extract expertise with exact supporting quotes, validates the quotations, then constructs recipient/article/topic/region relationships. Open the recipient graph to inspect its sources. Darkbloom is a separate adapter; Ollama execution is never labeled as Darkbloom use.
 
 Read [the complete source-to-graph flow](src/recipients/README.md). The checked-in preparation cache now contains the successful Darkbloom run over six fictional articles; the earlier local-model run was also verified. The network view can rerun preparation. It displays provider, model, run time, and sources. Private matching uses those validated profiles; the tip is never an input to public-corpus preparation.
@@ -45,19 +49,19 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite needs running Ollama and exercises actual inference, independent phone/desk browser contexts, encrypted request bodies, a dropped receipt and idempotent retry, source inspection, changed payment amounts, preview pairing, a real image-to-description run, and reader-only image access. Screenshots are saved locally under ignored `artifacts/qa-phone-flow/`.
+The browser suite needs running Ollama; the Tinfoil flow also requires a valid `TINFOIL_API_KEY`. It exercises actual inference, independent phone/desk browser contexts, encrypted request bodies, a dropped receipt and idempotent retry, source inspection, changed payment amounts, preview pairing, a real image-to-description run, reader-only image access, verified Tinfoil review, local brief download, and reconnecting an expired desk. Run the sponsor flow alone with `npx playwright test tinfoil-flow.spec.ts`. Screenshots are saved locally under ignored `artifacts/qa-phone-flow/`.
 
 The Dockerfile builds a standalone app serving the frontend and API on port 3001. `docker build -t localpoast:demo .` builds for the host architecture. Tinfoil deployment requires a supported image architecture, registry digest, measured config release, and actual instance verification; a local Docker build is not that deployment.
 
 ## Privacy boundary
 
-In local-demo mode OpenPGP encrypts request bodies to an ephemeral desk key and response bodies to each browser's ephemeral reply key. The local backend and intended desk reader see plaintext. The HTTPS app delivery and supplied public key remain trusted. This does not hide network metadata, prove geographic presence, or independently verify a publication. No attestation is claimed for local mode.
+In local-demo mode OpenPGP encrypts request bodies to an ephemeral desk key and response bodies to each browser's ephemeral reply key. The local backend and intended desk reader see plaintext. The HTTPS app delivery and supplied public key remain trusted. This does not hide network metadata, prove geographic presence, or independently verify a publication. The local intake is not attested; the optional hosted Tinfoil review verifies its own inference service separately.
 
 Reader and sender capabilities are separate; sender access cannot read or reset the desk. Evidence and analysis stay in process memory. Reset removes that session and rotates access; restart loses all sessions. It is not forensic erasure. Drafts remain in browser memory and are not auto-saved across page reloads. There is no onward delivery to a journalist.
 
 ## Sponsor readiness
 
-Tinfoil Container deployment and live sponsor API connections require user credentials. Local development is explicitly labeled. The Tinfoil bounty requires actual Container deployment; a local demo alone does not meet that criterion.
+Tinfoil inference and Darkbloom preparation have both completed live requests. Local development is explicitly labeled. The Tinfoil bounty requires actual Container deployment; hosted inference alone does not meet that criterion. [Deployment artifacts and remaining account/publication gates](docs/tinfoil-deployment.md) include a text-only Container candidate; the live photo flow still runs on the laptop.
 
 See [sponsor execution evidence and remaining gates](docs/sponsor-evidence.md). The [event submission instructions](https://localhostai.nyc/submitting) require a public repository and two-minute video by 5 PM. This repository is currently private as requested; publication, collaborator invitations, and event submission have not been performed.
 

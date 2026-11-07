@@ -1,0 +1,29 @@
+# Triggered by tinfoil-release.yml on its new tag.
+# Adapted from the official template commit recorded in the deployment guide.
+name: Tinfoil Release - Publish (auto-triggered)
+run-name: Publish release ${{ github.ref_name }}
+"on":
+  workflow_dispatch:
+concurrency:
+  group: tinfoil-container-release-${{ github.ref_name }}
+jobs:
+  measure-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Checkout and guard config
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Validate before measurement
+        run: |
+          python3 -m pip install -r requirements.txt
+          python3 validate-config.py tinfoil-config.yml
+      - name: Measure, attest, and publish
+        uses: tinfoilsh/measure-image-action@beba4296251f7a9bc44b481ebafe4863509e4380 # v0.14.1
+        with:
+          config-file: ${{ github.workspace }}/tinfoil-config.yml
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mark-as-latest: "false"

@@ -11,7 +11,7 @@ export async function secureJson<T>(path:string,body:unknown,retried=false):Prom
     secureClient??=(async()=>{const {SecureClient}=await import('tinfoil');const client=new SecureClient({enclaveURL:config.enclaveURL!,configRepo:config.configRepo!});await client.ready();return client;})();
     const client=await secureClient;
     const r=await client.fetch(new URL(path,config.enclaveURL!).href,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const data=await r.json();if(!r.ok)throw new Error(data.error??'Request failed');return data as T;
+    const data=await r.json();if(!r.ok)throw Object.assign(new Error(data.error??'Request failed'),{code:r.status});return data as T;
   }
   if(!window.isSecureContext)throw new Error('Open the HTTPS phone link to use encrypted intake.');
   const pgp=await import('openpgp');
@@ -36,11 +36,18 @@ export function ensureDeskSession():Promise<DeskSession>{
  const session={...created,readerSecret};localStorage.setItem(storageKey,JSON.stringify(session));return session;
  })().catch(e=>{sessionPromise=undefined;throw e;});
 }
+export function reconnectDeskSession(expired:DeskSession):Promise<DeskSession>{
+ const cached=localStorage.getItem(storageKey);
+ try{if(cached&&JSON.parse(cached).sessionId===expired.sessionId)localStorage.removeItem(storageKey);}catch{localStorage.removeItem(storageKey);}
+ sessionPromise=undefined;
+ return ensureDeskSession();
+}
 export function readDesk(session:DeskSession){return secureJson<DeskSnapshot>('/api/desk/read',{sessionId:session.sessionId,readerSecret:session.readerSecret});}
 export function submitTip(sessionId:string,senderCapability:string,submissionId:string,tip:Tip){return secureJson<Receipt>('/api/submit',{sessionId,senderCapability,submissionId,tip});}
 export function describePhoto(sessionId:string,senderCapability:string,requestId:string,dataUrl:string){return secureJson<PhotoDescription>('/api/photo/describe',{sessionId,senderCapability,requestId,dataUrl});}
 export function readPhoto(session:DeskSession,photoId:string){return secureJson<{dataUrl:string}>('/api/desk/photo',{sessionId:session.sessionId,readerSecret:session.readerSecret,photoId});}
 export function retryAnalysis(session:DeskSession,id:string){return secureJson<{ok:boolean}>('/api/desk/retry',{sessionId:session.sessionId,readerSecret:session.readerSecret,submissionId:id});}
+export function reviewWithTinfoil(session:DeskSession,id:string){return secureJson<{ok:true}>('/api/desk/tinfoil-review',{sessionId:session.sessionId,readerSecret:session.readerSecret,submissionId:id});}
 export async function resetDesk(session:DeskSession){const readerSecret=crypto.randomUUID()+crypto.randomUUID();const created=await secureJson<Omit<DeskSession,'readerSecret'>>('/api/desk/reset',{sessionId:session.sessionId,readerSecret:session.readerSecret,newReaderSecret:readerSecret});const next={...created,readerSecret};localStorage.setItem(storageKey,JSON.stringify(next));sessionPromise=Promise.resolve(next);return next;}
 export function prepareRecipients(session:DeskSession,provider:'ollama'|'darkbloom'|'fixture'='ollama'){return secureJson<PreparationReport>('/api/desk/prepare',{sessionId:session.sessionId,readerSecret:session.readerSecret,provider});}
 let currentOrigin='';

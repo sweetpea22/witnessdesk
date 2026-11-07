@@ -23,6 +23,14 @@ The model supplied investigation questions and a recipient selection. Amount ext
 
 The smoke loaded credentials from the local environment and forced `ANALYSIS_PROVIDER=tinfoil` only inside an isolated child process. It did not change the live server configuration. No credentials, complete prompts, response text, or raw provider errors were printed or saved.
 
+## In-app verified review and case export: successful
+
+On November 7 at 2:36 PM America/New_York, the browser flow submitted Cindy's synthetic evidence, completed local analysis, and explicitly requested **Review with Tinfoil** from the desk. This completed in 2,255 ms using `llama3-3-70b`. The SDK verification document reported `securityVerified: true`, config repository `tinfoilsh/confidential-model-router`, enclave `router-0.tinfoil.sh`, and release digest `95e49018369d59594468ed5af698631ba011937d3859fcbad21207eb0b0f9007`; its code and enclave fingerprints matched. Verification completed before the prompt was sent.
+
+The review retained the $230,000 application-calculated difference and selected `maya-chen` from the Darkbloom-prepared profiles. Original local findings remained unchanged. The browser downloaded a Markdown brief with exact evidence quotes, recipient provenance, and verification metadata. It excluded sender/reader capabilities and image bytes. Sender credentials and plaintext requests were rejected for the review endpoint. The expired-session reconnect flow also passed.
+
+Sanitized metadata, a screenshot, and the synthetic brief are retained locally in ignored `artifacts/qa-tinfoil-review/`. This attests the hosted inference service, not a Container deployment of Localpoast.
+
 ## Container readiness: deployment not established
 
 Only presence was checked; credential values and configuration addresses were not recorded.
@@ -30,12 +38,12 @@ Only presence was checked; credential values and configuration addresses were no
 | Prerequisite | Observed presence |
 | --- | --- |
 | `TINFOIL_API_KEY` | Present; inference request succeeded |
-| `TINFOIL_ADMIN_KEY` | Absent |
+| `TINFOIL_ADMIN_KEY` | Replaced by user; fresh read-only check now confirms organization context and zero existing containers |
 | `TINFOIL_CONTAINER_URL` | Absent |
 | `TINFOIL_CONFIG_REPO` | Absent |
-| `tinfoil` CLI executable on the child process PATH | Absent; CLI authentication not verified |
+| `tinfoil` CLI executable | Version 0.19.20 installed for deployment preparation; read-only authentication check succeeded |
 | Repository Dockerfile | Present |
-| Repository-root Tinfoil or enclave config candidate | None found |
+| Tinfoil config candidate | Prepared under deploy/tinfoil; publication/deployment not performed |
 | Workflow directory | Present; existing `check.yml` only |
 
 No Container was created or deployed, and no repository or configuration was published. This successful inference request does **not** demonstrate the Container deployment required by the Tinfoil track described in [sponsor execution evidence](sponsor-evidence.md). Containers-enabled organization access, deployment configuration, a live instance, and a verified application request remain unverified.

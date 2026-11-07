@@ -1,0 +1,58 @@
+# CANDIDATE ONLY. Copy this directory into a separately approved PUBLIC repo.
+# localpoast source and GHCR image remain private.
+# Replace the image digest; validate-config.py rejects the unresolved value.
+# Proposed separate public repository: sweetpea22/localpoast-tinfoil-config.
+# Official template snapshot: bae2dd20dd17d5fd7708783ab84e5da296c061cf.
+cvm-version: "0.14.7"
+cpus: 2
+memory: 8192
+
+networks:
+  outbound:
+    # Tinfoil SDK discovers verified router hostnames dynamically.
+    # This permits public egress; it is not a hostname allowlist.
+    egress: open
+
+containers:
+  - name: localpoast
+    image: "ghcr.io/sweetpea22/localpoast@sha256:REPLACE_WITH_64_HEX_IMAGE_DIGEST"
+    read_only: true
+    user: "1000:1000"
+    networks: [outbound]
+    tmpfs:
+      /tmp: "size=128m,mode=1777"
+      /home/node/.tinfoil: "size=1m,uid=1000,gid=1000,mode=0700"
+    # DOMAIN is reserved and injected by Tinfoil. Derive the application's
+    # existing self-URL settings without guessing its eventual hostname.
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        case "$DOMAIN" in
+          ""|*[!a-zA-Z0-9.-]*) echo "Missing or invalid Tinfoil DOMAIN" >&2; exit 1 ;;
+        esac
+        export TINFOIL_CONTAINER_URL="https://$DOMAIN"
+        export PUBLIC_ORIGIN="https://$DOMAIN"
+        exec ./node_modules/.bin/tsx src/server/index.ts
+    env:
+      - NODE_ENV: "production"
+      - PORT: "3001"
+      - ANALYSIS_PROVIDER: "tinfoil"
+      - TINFOIL_MODEL: "llama3-3-70b"
+      - TINFOIL_CONFIG_REPO: "sweetpea22/localpoast-tinfoil-config"
+      - DARKBLOOM_BASE_URL: "https://api.darkbloom.dev/v1"
+      - DARKBLOOM_MODEL: "gemma-4-26b"
+    secrets:
+      - TINFOIL_API_KEY
+      - DARKBLOOM_API_KEY
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    restart: on-failure
+
+shim:
+  upstream-container: localpoast
+  upstream-port: 3001
+  paths: ["/*"]

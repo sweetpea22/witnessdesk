@@ -4,7 +4,7 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5173';
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: ['phone-flow.spec.ts', 'vision-flow.spec.ts'],
+  testMatch: ['phone-flow.spec.ts', 'vision-flow.spec.ts', 'tinfoil-flow.spec.ts'],
   outputDir: 'artifacts/qa-phone-flow',
   fullyParallel: false,
   workers: 1,

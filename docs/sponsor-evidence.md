@@ -4,14 +4,14 @@ Checked November 7, 2026 against the [official tracks](https://localhostai.nyc/t
 
 | Target | Criterion | Implemented behavior | Observed result | Remaining gate |
 | --- | --- | --- | --- | --- |
-| Tinfoil | $500, best app deployed as a Tinfoil Container | SDK inference adapter in src/server/analysis.ts; SecureClient branch in src/shared/api.ts; standalone Dockerfile | Production frontend and Docker image build successfully; verified-SDK hosted inference succeeded in 3.166s (see sponsor-live-check.md) | Containers-enabled org/admin, measured public config release, registry image, live instance and verified browser request |
+| Tinfoil | $500, best app deployed as a Tinfoil Container | SDK inference adapter, explicit desk review, verification metadata, SecureClient branch, standalone Dockerfile and deployment candidates | In-app hosted inference succeeded in 2.255s with a verified SDK document and unchanged original analysis; brief download passed (see sponsor-live-check.md) | Containers-enabled org/admin, measured public config release, registry image, live instance and verified browser request |
 | Darkbloom | $500, best project running real work on Darkbloom | Fixed-corpus extraction adapter in src/recipients/index.ts against documented chat-completions API | Live extraction succeeded after credits: 6 articles → 3 validated profiles in 3.605s; running desk recommendation verified (see darkbloom-live-check.md) | Record the end-to-end demo and submit the event entry |
 | Private inference routing | Secondary $500 category | Private tips use selected Ollama/Tinfoil path; portfolio preparation is separate | Real local inference exercised; tip absent from preparation input | Sponsor routing demonstration and judge assessment |
 | SIE / Cognee | Additional task-offloading / shared-memory criteria | Deferred | Not implemented | Only consider after primary sponsor integrations work |
 
 ## Completed local proof
 
-Ollama `llama3:8b` actually processed the six synthetic portfolio articles on this computer. Run `cc04b6fd-7c7d-4faa-a4b7-ccb22893467b` started 2026-11-07T18:43:28.495Z and finished 18:43:49.409Z. It produced three validated profiles, 19 graph nodes, and 16 source-linked edges. The corpus hash and exact outputs are in fixtures/prepared-demo.json. This is cached local preprocessing, not Darkbloom execution.
+Ollama `llama3:8b` actually processed the six synthetic portfolio articles on this computer. Run `cc04b6fd-7c7d-4faa-a4b7-ccb22893467b` started 2026-11-07T18:43:28.495Z and finished 18:43:49.409Z. It produced three validated profiles, 19 graph nodes, and 16 source-linked edges. This earlier local preprocessing run was subsequently replaced in fixtures/prepared-demo.json by the validated Darkbloom run documented in [the live report](darkbloom-live-check.md).
 
 The model selects source-derived sentence/topic candidates under a constrained JSON schema. All quotations are validated against the attributed article; each profile needs both supplied articles. Unknown IDs, invented quotes, unsupported specialties, and failed runs cannot acquire a successful provider badge.
 

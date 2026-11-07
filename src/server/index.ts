@@ -7,6 +7,7 @@ import {generateKey,readPrivateKey,readKey,readMessage,decrypt,createMessage,enc
 import {z} from 'zod';
 import {DeskStore,ApiError} from './store';
 import {analyzeTip,analysisProvider} from './analysis';
+import {runTinfoilReview} from './tinfoil-review';
 import {PhotoStore} from './vision';
 import {getRecipientProfiles,getRecipientGraph,getPreparationReport,prepareRecipientProfiles} from '../recipients/index';
 import type {Submission,ProviderStatus} from '../shared/contracts';
@@ -31,6 +32,7 @@ async function handle(route:string,raw:unknown){
  if(route==='/api/desk/photo'){const request=z.object({photoId:z.string().uuid()}).parse(raw);return photos.image(p.sessionId,request.photoId);}
  if(route==='/api/desk/reset'){const next=z.object({newReaderSecret:z.string().min(40)}).parse(raw);const reset=store.reset(p.sessionId,p.readerSecret,next.newReaderSecret);photos.reset(p.sessionId);return reset;}
  if(route==='/api/desk/retry'){const request=z.object({submissionId:z.string()}).parse(raw);const row=session.submissions.get(request.submissionId);if(!row)throw new ApiError(404,'Submission not found.');if(row.state==='failed')void runAnalysis(row);return {ok:true};}
+ if(route==='/api/desk/tinfoil-review'){const request=z.object({submissionId:z.string()}).parse(raw);const row=session.submissions.get(request.submissionId);if(!row)throw new ApiError(404,'Submission not found.');if(!process.env.TINFOIL_API_KEY)throw new ApiError(503,'Tinfoil is not configured.');if(row.state!=='ready'||!row.analysis)throw new ApiError(409,'Wait for the initial analysis before requesting a Tinfoil review.');void runTinfoilReview(row,getRecipientProfiles());return {ok:true};}
  if(route==='/api/desk/prepare'){const request=z.object({provider:z.enum(['ollama','darkbloom','fixture']).default('ollama')}).parse(raw);if(getPreparationReport().state!=='working')void prepareRecipientProfiles({provider:request.provider}).catch(()=>{});return getPreparationReport();}
  throw new ApiError(404,'Unknown operation.');
 }
@@ -38,7 +40,7 @@ app.get('/api/bootstrap',(_req,res)=>res.json(mode==='tinfoil-container'?{mode,e
 app.get('/api/status',async(_req,res)=>res.json(await status()));
 app.get('/health',(_req,res)=>res.json({ok:true}));
 app.post('/api/secure',async(req,res)=>{let replyPublicKey:string|undefined;try{if(mode!=='local-demo')throw new ApiError(404,'Use the attested Container transport.');const envelope=z.object({ciphertext:z.string().max(5800000)}).parse(req.body);const decoded=await decrypt({message:await readMessage({armoredMessage:envelope.ciphertext}),decryptionKeys:privateKey,format:'utf8'});const payload=z.object({path:z.string(),body:z.unknown(),replyPublicKey:z.string()}).parse(JSON.parse(decoded.data as string));replyPublicKey=payload.replyPublicKey;let result:unknown;try{result={ok:true,data:await handle(payload.path,payload.body)};}catch(e){result={ok:false,error:e instanceof z.ZodError?'Invalid request.':e instanceof ApiError?e.message:'The request could not be completed.',code:e instanceof ApiError?e.status:400};}const ciphertext=await encrypt({message:await createMessage({text:JSON.stringify(result)}),encryptionKeys:await readKey({armoredKey:replyPublicKey}),format:'armored'});res.json({ciphertext});}catch{res.status(400).json({error:'Encrypted request could not be opened. Refresh the page and try again.'});}});
-app.post(['/api/sessions','/api/photo/describe','/api/desk/photo','/api/submit','/api/desk/read','/api/desk/retry','/api/desk/reset','/api/desk/prepare'],async(req,res)=>{if(mode!=='tinfoil-container'){res.status(403).json({error:'Encrypted transport required.'});return;}try{res.json(await handle(req.path,req.body));}catch(e){res.status(e instanceof ApiError?e.status:400).json({error:e instanceof ApiError?e.message:'Invalid request.'});}});
+app.post(['/api/sessions','/api/photo/describe','/api/desk/photo','/api/submit','/api/desk/read','/api/desk/retry','/api/desk/tinfoil-review','/api/desk/reset','/api/desk/prepare'],async(req,res)=>{if(mode!=='tinfoil-container'){res.status(403).json({error:'Encrypted transport required.'});return;}try{res.json(await handle(req.path,req.body));}catch(e){res.status(e instanceof ApiError?e.status:400).json({error:e instanceof ApiError?e.message:'Invalid request.'});}});
 const dist=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../dist');
 if(existsSync(dist)){app.use(express.static(dist));app.get('/{*path}',(_req,res)=>res.sendFile(path.join(dist,'index.html')));}
 const port=Number(process.env.PORT||3001);app.listen(port,'0.0.0.0',()=>{console.log(`Witness Desk backend ready on port ${port} (${mode})`);});

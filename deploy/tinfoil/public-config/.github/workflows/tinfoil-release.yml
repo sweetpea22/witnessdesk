@@ -1,0 +1,45 @@
+# Adapted from tinfoilsh/tinfoil-containers-template at bae2dd20dd17d5fd7708783ab84e5da296c061cf.
+name: Tinfoil Release
+run-name: Release ${{ inputs.version }}
+"on":
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Config release version, for example v0.0.1"
+        required: true
+        type: string
+concurrency:
+  group: tinfoil-container-release-${{ inputs.version }}
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Validate resolved config and version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -eu
+          printf '%s' "$VERSION" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'
+          python3 -m pip install -r requirements.txt
+          python3 validate-config.py tinfoil-config.yml
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "::error::Release tag already exists"
+            exit 1
+          fi
+      - name: Create and push release tag
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git tag "$VERSION" "$GITHUB_SHA"
+          git push origin "refs/tags/$VERSION"
+      - name: Dispatch measured publication on the tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ inputs.version }}
+        run: gh workflow run tinfoil-release-publish.yml --ref "$VERSION"
