@@ -1,10 +1,11 @@
 export type SubmissionState='received'|'analyzing'|'ready'|'failed';
-export type Tip={contributorAlias:string;evidenceText:string;contextNote?:string};
+export type Tip={contributorAlias:string;evidenceText:string;contextNote?:string;photoId?:string};
+export type PhotoDescription={id:string;description:string;extractedText:string;uncertainties:string[];provider:'ollama';model:string;durationMs:number};
 export type DeskSession={sessionId:string;readerSecret:string;senderCapability:string};
 export type Receipt={submissionId:string;receivedAt:string;state:'received'};
 export type Citation={documentId:string;title:string;quote:string};
 export type Analysis={kind:'possible_overpayment'|'no_supported_discrepancy'|'insufficient_evidence';summary:string;invoiceAmount:number|null;paymentAmount:number|null;difference:number|null;citations:Citation[];openQuestions:string[];recipientIds:string[];provider:'tinfoil'|'ollama'|'deterministic-demo';model:string;durationMs:number};
-export type Submission={id:string;tip:Tip;receivedAt:string;state:SubmissionState;analysis?:Analysis;error?:string};
+export type Submission={id:string;tip:Tip;receivedAt:string;state:SubmissionState;analysis?:Analysis;error?:string;photo?:PhotoDescription};
 export type RecipientSource={id:string;title:string;text:string;url?:string;kind:'fictional-demo'|'public-web'};
 export type RecipientProfile={id:string;name:string;publication:string;role:string;region:string;specialties:string[];bio:string;sources:RecipientSource[];supportingCitations:Citation[];preparationProvider:string;preparationRunId:string};
 export type GraphNode={id:string;label:string;type:'recipient'|'article'|'topic'|'region'};

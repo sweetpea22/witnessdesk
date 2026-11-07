@@ -1,4 +1,4 @@
-import type {DeskSession,DeskSnapshot,Tip,Receipt,PreparationReport,ProviderStatus} from './contracts';
+import type {DeskSession,DeskSnapshot,Tip,Receipt,PreparationReport,ProviderStatus,PhotoDescription} from './contracts';
 type Bootstrap={mode:'local-demo'|'tinfoil-container';publicKey?:string;enclaveURL?:string;configRepo?:string};
 let bootstrap:Promise<Bootstrap>|undefined;
 let replyKeys:Promise<{privateKey:string;publicKey:string}>|undefined;
@@ -38,6 +38,8 @@ export function ensureDeskSession():Promise<DeskSession>{
 }
 export function readDesk(session:DeskSession){return secureJson<DeskSnapshot>('/api/desk/read',{sessionId:session.sessionId,readerSecret:session.readerSecret});}
 export function submitTip(sessionId:string,senderCapability:string,submissionId:string,tip:Tip){return secureJson<Receipt>('/api/submit',{sessionId,senderCapability,submissionId,tip});}
+export function describePhoto(sessionId:string,senderCapability:string,requestId:string,dataUrl:string){return secureJson<PhotoDescription>('/api/photo/describe',{sessionId,senderCapability,requestId,dataUrl});}
+export function readPhoto(session:DeskSession,photoId:string){return secureJson<{dataUrl:string}>('/api/desk/photo',{sessionId:session.sessionId,readerSecret:session.readerSecret,photoId});}
 export function retryAnalysis(session:DeskSession,id:string){return secureJson<{ok:boolean}>('/api/desk/retry',{sessionId:session.sessionId,readerSecret:session.readerSecret,submissionId:id});}
 export async function resetDesk(session:DeskSession){const readerSecret=crypto.randomUUID()+crypto.randomUUID();const created=await secureJson<Omit<DeskSession,'readerSecret'>>('/api/desk/reset',{sessionId:session.sessionId,readerSecret:session.readerSecret,newReaderSecret:readerSecret});const next={...created,readerSecret};localStorage.setItem(storageKey,JSON.stringify(next));sessionPromise=Promise.resolve(next);return next;}
 export function prepareRecipients(session:DeskSession,provider:'ollama'|'darkbloom'|'fixture'='ollama'){return secureJson<PreparationReport>('/api/desk/prepare',{sessionId:session.sessionId,readerSecret:session.readerSecret,provider});}

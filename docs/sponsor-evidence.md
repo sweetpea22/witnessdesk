@@ -4,8 +4,8 @@ Checked November 7, 2026 against the [official tracks](https://localhostai.nyc/t
 
 | Target | Criterion | Implemented behavior | Observed result | Remaining gate |
 | --- | --- | --- | --- | --- |
-| Tinfoil | $500, best app deployed as a Tinfoil Container | SDK inference adapter in src/server/analysis.ts; SecureClient branch in src/shared/api.ts; standalone Dockerfile | Production frontend and local Docker image build successfully; no Tinfoil request executed | API key, Containers-enabled org/admin, measured public config release, registry image, live instance and verified browser request |
-| Darkbloom | $500, best project running real work on Darkbloom | Fixed-corpus extraction adapter in src/recipients/index.ts against documented chat-completions API | Adapter code and provenance tests pass; no live Darkbloom request executed | Key, available model, successful extraction run consumed by live recommendation |
+| Tinfoil | $500, best app deployed as a Tinfoil Container | SDK inference adapter in src/server/analysis.ts; SecureClient branch in src/shared/api.ts; standalone Dockerfile | Production frontend and Docker image build successfully; verified-SDK hosted inference succeeded in3.166s (see sponsor-live-check.md) | Containers-enabled org/admin, measured public config release, registry image, live instance and verified browser request |
+| Darkbloom | $500, best project running real work on Darkbloom | Fixed-corpus extraction adapter in src/recipients/index.ts against documented chat-completions API | Authenticated model list succeeds; real extraction request rejected HTTP402; previous local profiles retained | Resolve account execution access/credits; successful extraction run consumed by live recommendation |
 | Private inference routing | Secondary $500 category | Private tips use selected Ollama/Tinfoil path; portfolio preparation is separate | Real local inference exercised; tip absent from preparation input | Sponsor routing demonstration and judge assessment |
 | SIE / Cognee | Additional task-offloading / shared-memory criteria | Deferred | Not implemented | Only consider after primary sponsor integrations work |
 

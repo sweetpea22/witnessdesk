@@ -15,6 +15,7 @@ test('Cindy scenario computes $230,000 and follows changed payment input',()=>{
  assert.equal(supportedAmounts(DEMO_EVIDENCE.replace('350,000','350,000 EUR')).paymentAmount,null);
  assert.equal(supportedAmounts(DEMO_EVIDENCE+'\nAmount sent: USD 400,000').paymentAmount,null);
  assert.equal(supportedAmounts(DEMO_EVIDENCE.replace('INV-204','INV-2040')).paymentAmount,null);
+ assert.equal(supportedAmounts(DEMO_EVIDENCE.replaceAll(': ', '\n')).paymentAmount,350000);
 });
 test('sender authorization never grants a desk read, and sessions stay isolated',()=>{
  const store=new DeskStore();const one=store.create(secret);const two=store.create('s'.repeat(64));

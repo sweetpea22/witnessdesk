@@ -4,6 +4,9 @@ import {z} from 'zod';
 
 export const adviceSchema=z.object({openQuestions:z.array(z.string().min(5).max(280)).min(1).max(3),recipientIds:z.array(z.string()).max(3)});
 export function supportedAmounts(text:string){
+ // OCR often places a field label and its value on adjacent lines.
+ // Join only known labels; never invent a missing amount or reference.
+ text=text.replace(/\r\n/g,'\n').replace(/^(Amount[ \t]+(?:sent|paid)|Payment[ \t]+amount|Invoice reference|Contract)[ \t]*:?[ \t]*\n[ \t]*([^\n]+)$/gim,(_match,label:string,value:string)=>`${label}: ${value}`);
  const matches=[...text.matchAll(/^[ \t]*(?:Amount[ \t]+(?:sent|paid)|Payment[ \t]+amount)[ \t]*:[ \t]*(?:USD[ \t]*|\$)?(\d+(?:,\d{3})*(?:\.\d{1,2})?)[ \t]*$/gim)];
  const amount=matches.length===1?Number(matches[0][1].replaceAll(',','')):null;
  const linked=/^Invoice reference:[ \t]*INV-204[ \t]*$/mi.test(text)&&/^Contract:[ \t]*K-17[ \t]*$/mi.test(text);
@@ -35,5 +38,5 @@ export async function analyzeTip(tip:Tip,profiles:RecipientProfile[]):Promise<An
  const advice=adviceSchema.parse(extractJson(text));
  if(advice.recipientIds.some(id=>!profiles.some(p=>p.id===id)))throw new Error('The model returned an unsupported recipient. Retry analysis.');
  const {invoiceAmount,paymentAmount}=amounts;const difference=paymentAmount===null?null:paymentAmount-invoiceAmount;
- return {kind:difference===null?'insufficient_evidence':difference>0?'possible_overpayment':'no_supported_discrepancy',summary:difference===null?'The submitted text does not establish a payment amount linked to invoice INV-204 and contract K-17.':difference>0?`The payment record shows $${paymentAmount!.toLocaleString('en-US')} sent against a $120,000 invoice. The $${difference.toLocaleString('en-US')} difference needs an explanation.`:'This submitted payment does not exceed the $120,000 invoice. Further context may still be needed.',invoiceAmount,paymentAmount,difference,citations:[{documentId:'invoice-inv204',title:'Invoice INV-204',quote:INVOICE_TEXT},{documentId:'submitted-payment',title:'Cindy’s submitted payment record',quote:tip.evidenceText}],openQuestions:advice.openQuestions,recipientIds:advice.recipientIds,provider:provider as Analysis['provider'],model:provider==='deterministic-demo'?'No model · explicit fixture mode':model,durationMs:Date.now()-started};
+ return {kind:difference===null?'insufficient_evidence':difference>0?'possible_overpayment':'no_supported_discrepancy',summary:difference===null?'The submitted text does not establish a payment amount linked to invoice INV-204 and contract K-17.':difference>0?`The payment record shows $${paymentAmount!.toLocaleString('en-US')} sent against a $120,000 invoice. The $${difference.toLocaleString('en-US')} difference needs an explanation.`:'This submitted payment does not exceed the $120,000 invoice. Further context may still be needed.',invoiceAmount,paymentAmount,difference,citations:[{documentId:'invoice-inv204',title:'Invoice INV-204',quote:INVOICE_TEXT},{documentId:'submitted-payment',title:tip.photoId?'Cindy’s reviewed photo transcript':'Cindy’s submitted payment record',quote:tip.evidenceText}],openQuestions:advice.openQuestions,recipientIds:advice.recipientIds,provider:provider as Analysis['provider'],model:provider==='deterministic-demo'?'No model · explicit fixture mode':model,durationMs:Date.now()-started};
 }
