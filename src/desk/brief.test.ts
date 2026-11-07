@@ -22,3 +22,15 @@ test('case brief preserves both analyses and provenance without serializing imag
   submission.tinfoilReview!.state = 'failed';
   assert.ok(!createCaseBrief(submission, [profile]).includes('tinfoil-test-model'), 'failed review must not export a stale success');
 });
+
+test('public reporter export preserves the matching input snapshot and its exact cited source URL', () => {
+  const source = { id: 'public-bio', title: 'Reporter biography', text: 'Exact public biography excerpt.', url: 'https://news.example/reporters/example?section=finance&view=bio', kind: 'public-web' as const, retrievedAt: '2026-11-07T20:00:00Z', sourceType: 'bio' as const, relation: 'about-reporter' as const };
+  const matchedProfile: RecipientProfile = { id: 'public-reporter', name: 'Public Reporter', publication: 'Public Newsroom', role: 'Finance reporter', region: 'United States', specialties: ['Corporate finance'], bio: source.text, sources: [source], supportingCitations: [{ documentId: source.id, title: source.title, quote: source.text }], preparationProvider: 'darkbloom', preparationRunId: 'public-preparation-original', cohortIds: ['us-finance'], publicContact: { url: 'https://news.example/contact', scope: 'newsroom', sourceId: source.id } };
+  const submission: Submission = { id: 'public-match-case', state: 'ready', receivedAt: '2026-11-07T20:10:00Z', tip: { contributorAlias: 'Cindy', evidenceText: 'Private submitted record' }, reporterMatch: { state: 'ready', cohortIds: ['us-finance'], provider: 'ollama', model: 'private-matching-model', durationMs: 2200, preparationRunId: 'public-preparation-original', matches: [{ recipientId: matchedProfile.id, reason: 'Experience covering corporate payments.', sourceIds: [source.id] }], profiles: [matchedProfile] } };
+  const changedCurrentProfile = { ...matchedProfile, name: 'Changed network name', sources: [{ ...source, url: 'https://news.example/new-source', text: 'Changed current source' }] };
+  const brief = createCaseBrief(submission, [changedCurrentProfile]);
+  for (const expected of ['Public Reporter', 'private-matching-model', 'public-preparation-original', 'Experience covering corporate payments.', source.url, source.text, source.retrievedAt, 'https://news.example/contact']) assert.ok(brief.includes(expected), `missing ${expected}`);
+  for (const unwanted of ['Changed network name', 'https://news.example/new-source', 'Changed current source', 'Fictional recipient']) assert.ok(!brief.includes(unwanted), `unexpected ${unwanted}`);
+  submission.reporterMatch!.state = 'failed';
+  assert.ok(!createCaseBrief(submission, [changedCurrentProfile]).includes('private-matching-model'), 'failed public matching must not export a stale successful run');
+});

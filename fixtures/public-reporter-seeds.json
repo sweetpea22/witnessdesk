@@ -1,0 +1,350 @@
+{
+  "schemaVersion": 1,
+  "retrievedAt": "2026-11-07T20:30:25Z",
+  "scope": {
+    "defaultRegions": [
+      "United States"
+    ],
+    "synthetic": false
+  },
+  "cohorts": [
+    {
+      "id": "us-finance",
+      "label": "US financial accountability",
+      "description": "Public reporting on financial institutions, taxes, investment products and corporate finances."
+    },
+    {
+      "id": "us-corporate",
+      "label": "US corporate accountability",
+      "description": "Public reporting on companies, government contracts and business accountability."
+    }
+  ],
+  "reporters": [
+    {
+      "id": "paul-kiel",
+      "name": "Paul Kiel",
+      "publication": "ProPublica",
+      "role": "Business reporter",
+      "coverageRegion": "United States",
+      "cohortIds": [
+        "us-finance"
+      ],
+      "topics": [
+        "Finance"
+      ],
+      "bioSourceIds": [
+        "paul-kiel-bio"
+      ],
+      "articleSourceIds": [
+        "paul-kiel-article"
+      ],
+      "publicContact": {
+        "url": "https://www.propublica.org/people/paul-kiel",
+        "kind": "newsroom-author-page",
+        "scope": "individual",
+        "sourceId": "paul-kiel-bio"
+      },
+      "sources": [
+        {
+          "id": "paul-kiel-bio",
+          "url": "https://www.propublica.org/people/paul-kiel",
+          "title": "Paul Kiel — ProPublica",
+          "kind": "bio",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "I’m a business reporter with a focus this year on 401(k) plans.",
+          "supportedTopics": [
+            "Finance"
+          ],
+          "relation": "about-reporter"
+        },
+        {
+          "id": "paul-kiel-article",
+          "url": "https://www.propublica.org/article/401k-retirement-plan-fees-funds",
+          "title": "How to Check In on Your 401(k) Fees",
+          "kind": "article",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "How to Check In on Your 401(k) Fees",
+          "supportedTopics": [
+            "Finance"
+          ],
+          "byline": "Teddy Amenabar, Maya Miller and Paul Kiel",
+          "relation": "by-reporter"
+        }
+      ]
+    },
+    {
+      "id": "jeff-ernsthausen",
+      "name": "Jeff Ernsthausen",
+      "publication": "ProPublica",
+      "role": "Senior data reporter",
+      "coverageRegion": "United States",
+      "cohortIds": [
+        "us-finance"
+      ],
+      "topics": [
+        "Finance",
+        "Procurement",
+        "Public spending",
+        "Corporate accountability"
+      ],
+      "bioSourceIds": [
+        "jeff-ernsthausen-bio"
+      ],
+      "articleSourceIds": [
+        "jeff-ernsthausen-article"
+      ],
+      "publicContact": {
+        "url": "https://www.propublica.org/people/jeff-ernsthausen",
+        "kind": "newsroom-author-page",
+        "scope": "individual",
+        "sourceId": "jeff-ernsthausen-bio"
+      },
+      "sources": [
+        {
+          "id": "jeff-ernsthausen-bio",
+          "url": "https://www.propublica.org/people/jeff-ernsthausen",
+          "title": "Jeff Ernsthausen — ProPublica",
+          "kind": "bio",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "I report on immigration, government contracting, and the intersection of money and power.",
+          "supportedTopics": [
+            "Procurement",
+            "Public spending"
+          ],
+          "relation": "about-reporter"
+        },
+        {
+          "id": "jeff-ernsthausen-article",
+          "url": "https://www.propublica.org/article/trump-inc-podcast-one-trump-tax-cut-meant-to-help-the-poor-a-billionaire-ended-up-winning-big",
+          "title": "One Trump Tax Cut Was Meant to Help the Poor. A Billionaire Ended Up Winning Big.",
+          "kind": "article",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "One Trump Tax Cut Was Meant to Help the Poor. A Billionaire Ended Up Winning Big.",
+          "supportedTopics": [
+            "Finance",
+            "Corporate accountability"
+          ],
+          "byline": "Jeff Ernsthausen and Justin Elliott",
+          "relation": "by-reporter"
+        }
+      ]
+    },
+    {
+      "id": "jesse-eisinger",
+      "name": "Jesse Eisinger",
+      "publication": "ProPublica",
+      "role": "Assistant managing editor",
+      "coverageRegion": "United States",
+      "cohortIds": [
+        "us-finance"
+      ],
+      "topics": [
+        "Finance",
+        "Corporate accountability"
+      ],
+      "bioSourceIds": [
+        "jesse-eisinger-bio"
+      ],
+      "articleSourceIds": [
+        "jesse-eisinger-article"
+      ],
+      "publicContact": {
+        "url": "https://www.propublica.org/people/jesse-eisinger",
+        "kind": "newsroom-author-page",
+        "scope": "individual",
+        "sourceId": "jesse-eisinger-bio"
+      },
+      "sources": [
+        {
+          "id": "jesse-eisinger-bio",
+          "url": "https://www.propublica.org/people/jesse-eisinger",
+          "title": "Jesse Eisinger — ProPublica",
+          "kind": "bio",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "Jesse Eisinger is an assistant managing editor at ProPublica.",
+          "supportedTopics": [],
+          "relation": "about-reporter"
+        },
+        {
+          "id": "jesse-eisinger-article",
+          "url": "https://www.propublica.org/article/silicon-valley-bank-failure-fdic-fed-failure",
+          "title": "Regulatory Failure 101: What the Collapse of Silicon Valley Bank Reveals",
+          "kind": "article",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "Regulatory Failure 101: What the Collapse of Silicon Valley Bank Reveals",
+          "supportedTopics": [
+            "Finance",
+            "Corporate accountability"
+          ],
+          "byline": "Jesse Eisinger",
+          "relation": "by-reporter"
+        }
+      ]
+    },
+    {
+      "id": "justin-elliott",
+      "name": "Justin Elliott",
+      "publication": "ProPublica",
+      "role": "Reporter",
+      "coverageRegion": "United States",
+      "cohortIds": [
+        "us-corporate"
+      ],
+      "topics": [
+        "Corporate accountability",
+        "Procurement",
+        "Public spending"
+      ],
+      "bioSourceIds": [
+        "justin-elliott-bio"
+      ],
+      "articleSourceIds": [
+        "justin-elliott-article"
+      ],
+      "publicContact": {
+        "url": "https://www.propublica.org/people/justin-elliott",
+        "kind": "newsroom-author-page",
+        "scope": "individual",
+        "sourceId": "justin-elliott-bio"
+      },
+      "sources": [
+        {
+          "id": "justin-elliott-bio",
+          "url": "https://www.propublica.org/people/justin-elliott",
+          "title": "Justin Elliott — ProPublica",
+          "kind": "bio",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "I am a ProPublica reporter covering business and politics.",
+          "supportedTopics": [
+            "Corporate accountability"
+          ],
+          "relation": "about-reporter"
+        },
+        {
+          "id": "justin-elliott-article",
+          "url": "https://www.propublica.org/article/kristi-noem-dhs-misled-senate-judiciary-corey-lewandowski-contracts",
+          "title": "Kristi Noem Misled Congress About Top Aide’s Role in DHS Contracts",
+          "kind": "article",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "Kristi Noem Misled Congress About Top Aide’s Role in DHS Contracts",
+          "supportedTopics": [
+            "Procurement",
+            "Public spending"
+          ],
+          "byline": "Joshua Kaplan and Justin Elliott",
+          "relation": "by-reporter"
+        }
+      ]
+    },
+    {
+      "id": "robert-faturechi",
+      "name": "Robert Faturechi",
+      "publication": "ProPublica",
+      "role": "Reporter",
+      "coverageRegion": "United States",
+      "cohortIds": [
+        "us-corporate"
+      ],
+      "topics": [
+        "Corporate accountability",
+        "Procurement",
+        "Public spending"
+      ],
+      "bioSourceIds": [
+        "robert-faturechi-bio"
+      ],
+      "articleSourceIds": [
+        "robert-faturechi-article"
+      ],
+      "publicContact": {
+        "url": "https://www.propublica.org/people/robert-faturechi",
+        "kind": "newsroom-author-page",
+        "scope": "individual",
+        "sourceId": "robert-faturechi-bio"
+      },
+      "sources": [
+        {
+          "id": "robert-faturechi-bio",
+          "url": "https://www.propublica.org/people/robert-faturechi",
+          "title": "Robert Faturechi — ProPublica",
+          "kind": "bio",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "Currently I am reporting on President Donald Trump’s business interests, including Trump Media.",
+          "supportedTopics": [
+            "Corporate accountability"
+          ],
+          "relation": "about-reporter"
+        },
+        {
+          "id": "robert-faturechi-article",
+          "url": "https://www.propublica.org/article/george-kollitides-pentagon-contracts-alvarez-marsal",
+          "title": "The Pentagon Gave $350 Million in Contracts to a Firm Closely Tied to a Senior Defense Department Official",
+          "kind": "article",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "The Pentagon Gave $350 Million in Contracts to a Firm Closely Tied to a Senior Defense Department Official",
+          "supportedTopics": [
+            "Procurement",
+            "Public spending",
+            "Corporate accountability"
+          ],
+          "byline": "Aaron C. Davis and Robert Faturechi",
+          "relation": "by-reporter"
+        }
+      ]
+    },
+    {
+      "id": "peter-elkind",
+      "name": "Peter Elkind",
+      "publication": "ProPublica",
+      "role": "Reporter",
+      "coverageRegion": "United States",
+      "cohortIds": [
+        "us-corporate"
+      ],
+      "topics": [
+        "Corporate accountability",
+        "Finance"
+      ],
+      "bioSourceIds": [
+        "peter-elkind-bio"
+      ],
+      "articleSourceIds": [
+        "peter-elkind-article"
+      ],
+      "publicContact": {
+        "url": "https://www.propublica.org/people/peter-elkind",
+        "kind": "newsroom-author-page",
+        "scope": "individual",
+        "sourceId": "peter-elkind-bio"
+      },
+      "sources": [
+        {
+          "id": "peter-elkind-bio",
+          "url": "https://www.propublica.org/people/peter-elkind",
+          "title": "Peter Elkind — ProPublica",
+          "kind": "bio",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "I report on government and business, and the compelling stories behind the intersection of the two.",
+          "supportedTopics": [
+            "Corporate accountability"
+          ],
+          "relation": "about-reporter"
+        },
+        {
+          "id": "peter-elkind-article",
+          "url": "https://www.propublica.org/article/prospect-medical-malpractice-bankruptcy-hospitals-doctors-philadelphia",
+          "title": "For-Profit Hospital Chain Never Put Aside Money for Malpractice Insurance to Compensate Injured Patients",
+          "kind": "article",
+          "retrievedAt": "2026-11-07T20:30:25Z",
+          "excerpt": "For-Profit Hospital Chain Never Put Aside Money for Malpractice Insurance to Compensate Injured Patients",
+          "supportedTopics": [
+            "Corporate accountability",
+            "Finance"
+          ],
+          "byline": "Peter Elkind",
+          "relation": "by-reporter"
+        }
+      ]
+    }
+  ]
+}

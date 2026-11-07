@@ -34,7 +34,7 @@ export async function analyzeTip(tip:Tip,profiles:RecipientProfile[],requestedPr
  }else if(provider==='ollama'){
   const url=new URL('/api/chat',process.env.OLLAMA_URL||'http://127.0.0.1:11434');
   if(!['localhost','127.0.0.1','[::1]'].includes(url.hostname))throw new Error('Local analysis requires an Ollama loopback endpoint.');
-  const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,stream:false,format:'json',messages:[{role:'system',content:instruction},{role:'user',content:input}],options:{temperature:0,num_predict:400,num_ctx:4096}}),signal:AbortSignal.timeout(180000)});
+  const response=await fetch(url,{method:'POST',redirect:'error',headers:{'Content-Type':'application/json'},body:JSON.stringify({model,stream:false,format:'json',messages:[{role:'system',content:instruction},{role:'user',content:input}],options:{temperature:0,num_predict:400,num_ctx:4096}}),signal:AbortSignal.timeout(180000)});
   if(!response.ok)throw new Error(`Local model returned ${response.status}. Check Ollama and retry.`);
   const result=await response.json();text=result.message?.content||'';
  }else if(provider==='deterministic-demo'){

@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "corpusHash": "50c83ccb18f8368d43fd3c210e9686ceeb9274a7fb02745a368618926968bb8d",
+  "extracted": [
+    {
+      "id": "paul-kiel",
+      "evidence": [
+        {
+          "specialty": "Finance",
+          "sourceId": "paul-kiel-bio",
+          "quote": "I’m a business reporter with a focus this year on 401(k) plans."
+        },
+        {
+          "specialty": "Finance",
+          "sourceId": "paul-kiel-article",
+          "quote": "How to Check In on Your 401(k) Fees"
+        }
+      ]
+    },
+    {
+      "id": "jeff-ernsthausen",
+      "evidence": [
+        {
+          "specialty": "Procurement",
+          "sourceId": "jeff-ernsthausen-bio",
+          "quote": "I report on immigration, government contracting, and the intersection of money and power."
+        },
+        {
+          "specialty": "Public spending",
+          "sourceId": "jeff-ernsthausen-bio",
+          "quote": "I report on immigration, government contracting, and the intersection of money and power."
+        },
+        {
+          "specialty": "Finance",
+          "sourceId": "jeff-ernsthausen-article",
+          "quote": "One Trump Tax Cut Was Meant to Help the Poor. A Billionaire Ended Up Winning Big."
+        },
+        {
+          "specialty": "Corporate accountability",
+          "sourceId": "jeff-ernsthausen-article",
+          "quote": "One Trump Tax Cut Was Meant to Help the Poor. A Billionaire Ended Up Winning Big."
+        }
+      ]
+    },
+    {
+      "id": "jesse-eisinger",
+      "evidence": [
+        {
+          "specialty": "Finance",
+          "sourceId": "jesse-eisinger-article",
+          "quote": "Regulatory Failure 101: What the Collapse of Silicon Valley Bank Reveals"
+        },
+        {
+          "specialty": "Corporate accountability",
+          "sourceId": "jesse-eisinger-article",
+          "quote": "Regulatory Failure 101: What the Collapse of Silicon Valley Bank Reveals"
+        }
+      ]
+    },
+    {
+      "id": "justin-elliott",
+      "evidence": [
+        {
+          "specialty": "Corporate accountability",
+          "sourceId": "justin-elliott-bio",
+          "quote": "I am a ProPublica reporter covering business and politics."
+        },
+        {
+          "specialty": "Procurement",
+          "sourceId": "justin-elliott-article",
+          "quote": "Kristi Noem Misled Congress About Top Aide’s Role in DHS Contracts"
+        },
+        {
+          "specialty": "Public spending",
+          "sourceId": "justin-elliott-article",
+          "quote": "Kristi Noem Misled Congress About Top Aide’s Role in DHS Contracts"
+        }
+      ]
+    },
+    {
+      "id": "robert-faturechi",
+      "evidence": [
+        {
+          "specialty": "Corporate accountability",
+          "sourceId": "robert-faturechi-bio",
+          "quote": "Currently I am reporting on President Donald Trump’s business interests, including Trump Media."
+        },
+        {
+          "specialty": "Procurement",
+          "sourceId": "robert-faturechi-article",
+          "quote": "The Pentagon Gave $350 Million in Contracts to a Firm Closely Tied to a Senior Defense Department Official"
+        },
+        {
+          "specialty": "Public spending",
+          "sourceId": "robert-faturechi-article",
+          "quote": "The Pentagon Gave $350 Million in Contracts to a Firm Closely Tied to a Senior Defense Department Official"
+        },
+        {
+          "specialty": "Corporate accountability",
+          "sourceId": "robert-faturechi-article",
+          "quote": "The Pentagon Gave $350 Million in Contracts to a Firm Closely Tied to a Senior Defense Department Official"
+        }
+      ]
+    },
+    {
+      "id": "peter-elkind",
+      "evidence": [
+        {
+          "specialty": "Corporate accountability",
+          "sourceId": "peter-elkind-bio",
+          "quote": "I report on government and business, and the compelling stories behind the intersection of the two."
+        },
+        {
+          "specialty": "Corporate accountability",
+          "sourceId": "peter-elkind-article",
+          "quote": "For-Profit Hospital Chain Never Put Aside Money for Malpractice Insurance to Compensate Injured Patients"
+        },
+        {
+          "specialty": "Finance",
+          "sourceId": "peter-elkind-article",
+          "quote": "For-Profit Hospital Chain Never Put Aside Money for Malpractice Insurance to Compensate Injured Patients"
+        }
+      ]
+    }
+  ],
+  "report": {
+    "state": "ready",
+    "provider": "darkbloom",
+    "model": "gemma-4-26b",
+    "runId": "00183b4f-b371-4ea9-8971-6fd1623927a9",
+    "startedAt": "2026-11-07T20:38:26.505Z",
+    "completedAt": "2026-11-07T20:38:36.777Z",
+    "sourceCount": 12,
+    "profileCount": 6,
+    "sourceMode": "refreshed",
+    "corpusHash": "50c83ccb18f8368d43fd3c210e9686ceeb9274a7fb02745a368618926968bb8d",
+    "sourceChecks": [
+      {
+        "sourceId": "paul-kiel-bio",
+        "url": "https://www.propublica.org/people/paul-kiel",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:26.507Z",
+        "checkedAt": "2026-11-07T20:38:26.507Z",
+        "contentHash": "e55cc14c35cb2b06ab932ab65ce83d9c27ebee3131f4e7ac5f0f4d4c7f41b437",
+        "pageHash": "360e313a36dcd24fea071782bbaee0fd2d22a7e8d60585b63246baa3948cfad0"
+      },
+      {
+        "sourceId": "paul-kiel-article",
+        "url": "https://www.propublica.org/article/401k-retirement-plan-fees-funds",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:26.526Z",
+        "checkedAt": "2026-11-07T20:38:26.526Z",
+        "contentHash": "aec7905c18e3d95229df19e4464bc47ae73f0207e6bb79c5473ae4639626fd15",
+        "pageHash": "ec9e3583a801593822770c8f083466dc0ad1ee98036da57d2e8372821d00e0b5"
+      },
+      {
+        "sourceId": "jeff-ernsthausen-bio",
+        "url": "https://www.propublica.org/people/jeff-ernsthausen",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:26.527Z",
+        "checkedAt": "2026-11-07T20:38:26.527Z",
+        "contentHash": "ba10e0816a4d62495420ed5ec685e5cffb5483a1dfd6846a078e9d3917b10884",
+        "pageHash": "739633bf0d39a5fc3f237b61173083a96e303b6cddff50a6938a84a0dbcb7288"
+      },
+      {
+        "sourceId": "jeff-ernsthausen-article",
+        "url": "https://www.propublica.org/article/trump-inc-podcast-one-trump-tax-cut-meant-to-help-the-poor-a-billionaire-ended-up-winning-big",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:26.744Z",
+        "checkedAt": "2026-11-07T20:38:26.744Z",
+        "contentHash": "d420c9e4f33d6c77edfb50a660346ef12f6b68ef696c71e975d2af3e0af31f7f",
+        "pageHash": "6b72b640cdadf6eb93b85570de09ed8abfa0020df2741f3f44ec92071b532a9d"
+      },
+      {
+        "sourceId": "jesse-eisinger-bio",
+        "url": "https://www.propublica.org/people/jesse-eisinger",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:26.745Z",
+        "checkedAt": "2026-11-07T20:38:26.745Z",
+        "contentHash": "9eaed9c64afa03bda11a951e4ca79d9828c98d9414b1dfbf303220f3d4390cdb",
+        "pageHash": "a6af8c51fabe563193615b6c47be2593eadfa6f44fa043c5d61bb793a63d5732"
+      },
+      {
+        "sourceId": "jesse-eisinger-article",
+        "url": "https://www.propublica.org/article/silicon-valley-bank-failure-fdic-fed-failure",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:26.745Z",
+        "checkedAt": "2026-11-07T20:38:26.745Z",
+        "contentHash": "6cfd8ea720b6555bea9089799c5b6afba30865c4a6caf1af41c9bf2a7cada7a4",
+        "pageHash": "ed53e29043b4dea2463f34e3fad04d4ec009aa6b3e0d496b5026e5dcfee0ecd9"
+      },
+      {
+        "sourceId": "justin-elliott-bio",
+        "url": "https://www.propublica.org/people/justin-elliott",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:27.396Z",
+        "checkedAt": "2026-11-07T20:38:27.396Z",
+        "contentHash": "9e2dbedb6ecd3e435a6b3634c1aa395e7381e2e5db8d6ec9d19ca1aa0b359c72",
+        "pageHash": "974c11b9102ed0e8cc1c149ee1699b77a75b0f2114063ed3a4b4f172054ed526"
+      },
+      {
+        "sourceId": "justin-elliott-article",
+        "url": "https://www.propublica.org/article/kristi-noem-dhs-misled-senate-judiciary-corey-lewandowski-contracts",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:27.397Z",
+        "checkedAt": "2026-11-07T20:38:27.397Z",
+        "contentHash": "3cd40dc7399f2ef77f789c35cf2cfb7ce2e0648d54d9348ae2909ab0f1241253",
+        "pageHash": "86ba1365785277c9f960609b0a603565de2d363bda609a43ea9d8cc4b56ca4e7"
+      },
+      {
+        "sourceId": "robert-faturechi-bio",
+        "url": "https://www.propublica.org/people/robert-faturechi",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:27.397Z",
+        "checkedAt": "2026-11-07T20:38:27.397Z",
+        "contentHash": "8c0a0e5736251e0f028f3c70f75e2a204dd832ed878f377fe15c24dccd2ede37",
+        "pageHash": "bb77c5cd039fd7adba111766a455187d273de2d5489f00359b70aff3307b392d"
+      },
+      {
+        "sourceId": "robert-faturechi-article",
+        "url": "https://www.propublica.org/article/george-kollitides-pentagon-contracts-alvarez-marsal",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:28.205Z",
+        "checkedAt": "2026-11-07T20:38:28.205Z",
+        "contentHash": "dd8844e12935935f76eef47101077b0292411e0974fc5ae38054bd4bb968609f",
+        "pageHash": "67624af6e6239f2251c6b5d77c1ce87244dafeef9f548746211cfb090aeb0554"
+      },
+      {
+        "sourceId": "peter-elkind-bio",
+        "url": "https://www.propublica.org/people/peter-elkind",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:28.205Z",
+        "checkedAt": "2026-11-07T20:38:28.205Z",
+        "contentHash": "4fe0a258057fc909054b22126100464ba005d1deeb78f73893e87a91dc835bf3",
+        "pageHash": "3474cb094a69a02423bce5c1ece0a750164e15a88a61464af29b927b4c863bd8"
+      },
+      {
+        "sourceId": "peter-elkind-article",
+        "url": "https://www.propublica.org/article/prospect-medical-malpractice-bankruptcy-hospitals-doctors-philadelphia",
+        "status": "validated",
+        "retrievedAt": "2026-11-07T20:38:28.205Z",
+        "checkedAt": "2026-11-07T20:38:28.205Z",
+        "contentHash": "a8ee8eebab01a300f7c91778ca8ec9c43369d75a72eb7cdb94fb2ff514ee0d4c",
+        "pageHash": "314f208433250058877a277ccdf947d07cf452cd5a32f3959175af9f3c2b3ee5"
+      }
+    ]
+  }
+}

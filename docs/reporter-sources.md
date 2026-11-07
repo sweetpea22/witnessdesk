@@ -1,0 +1,24 @@
+# Public reporter seed provenance
+
+The user selected **US finance and corporate accountability**. `fixtures/public-reporter-seeds.json` contains six real journalism professionals, two cohorts (`us-finance`, `us-corporate`), and twelve public-source records retrieved on **2026-11-07 at 20:30:25 UTC**. This is a small, curated seed from one newsroom, ProPublica, rather than a comprehensive directory or ranking of US journalists. Jesse Eisinger's current role is editor, and the data preserves that distinction.
+
+| Person | Cohort | Official profile and public contact page | Selected work |
+| --- | --- | --- | --- |
+| Paul Kiel | US financial accountability | [Profile](https://www.propublica.org/people/paul-kiel) | [Article](https://www.propublica.org/article/401k-retirement-plan-fees-funds) |
+| Jeff Ernsthausen | US financial accountability | [Profile](https://www.propublica.org/people/jeff-ernsthausen) | [Article](https://www.propublica.org/article/trump-inc-podcast-one-trump-tax-cut-meant-to-help-the-poor-a-billionaire-ended-up-winning-big) |
+| Jesse Eisinger | US financial accountability | [Profile](https://www.propublica.org/people/jesse-eisinger) | [Article](https://www.propublica.org/article/silicon-valley-bank-failure-fdic-fed-failure) |
+| Justin Elliott | US corporate accountability | [Profile](https://www.propublica.org/people/justin-elliott) | [Article](https://www.propublica.org/article/kristi-noem-dhs-misled-senate-judiciary-corey-lewandowski-contracts) |
+| Robert Faturechi | US corporate accountability | [Profile](https://www.propublica.org/people/robert-faturechi) | [Article](https://www.propublica.org/article/george-kollitides-pentagon-contracts-alvarez-marsal) |
+| Peter Elkind | US corporate accountability | [Profile](https://www.propublica.org/people/peter-elkind) | [Article](https://www.propublica.org/article/prospect-medical-malpractice-bankruptcy-hospitals-doctors-philadelphia) |
+
+Each source stores its canonical URL, page or headline title, a short exact excerpt, retrieval time, content kind, and supported topics. Article excerpts are headlines; they are evidence of the published topic, not a substitute for the article or an independent finding about its subjects. Each reporter's selected article was opened and its byline checked. Merely appearing in a newsroom profile's article list was not treated as authorship. Bios have `relation: about-reporter` and no byline, even when written in the first person. Articles have `relation: by-reporter` and the actual individual or joint byline.
+
+The used topic vocabulary is `Finance`, `Corporate accountability`, `Procurement`, and `Public spending`. These are our normalized coverage labels, supported by the linked profile or article; they are not allegations about the journalists. Cohort assignment is an editorial grouping for the demo. Historical work demonstrates experience but does not establish a current assignment, availability, or interest in Cindy's specific story. Consult the current profile before any real outreach.
+
+`coverageRegion: United States` describes the selected reporting's jurisdiction. It is not a person's physical location, residence, presence proof, or verified identity. Every `publicContact` points to an official newsroom profile that offers a contact section. Contact-page availability does not promise a reply, guarantee confidentiality, or prove that a future message recipient controls that identity. No personal contact values, home addresses, social-network relationships, or inferred political affiliations are collected. Nobody was contacted.
+
+The public seed is separate from the original synthetic portfolios. Its `scope.synthetic` is `false`; this labels the real public sources, not Cindy's contrived evidence. For the demo, a $120,000 invoice and $350,000 payment produce a $230,000 discrepancy requiring explanation. That alone does not establish fraud, public funding, a particular company's involvement, or a reporter's willingness to take the story. Matching should explain which public coverage evidence is relevant and which context is still missing.
+
+Only these public snippets and professional metadata belong in public-profile preparation through Darkbloom. Private desk evidence should stay in the selected private/local matching flow. A model must not invent additional sources, quotations, affiliations, contact methods, sensitive-tip consent, identity verification, or geographic attestation. Keep the source links inspectable and label model-derived suggestions separately from this manually reviewed seed.
+
+Validation performed when the seed was written: six unique person IDs, exactly two cohorts, twelve unique source IDs, all selected article bylines containing the associated person's name, all normalized profile topics supported by an attached source, and every excerpt at most 25 words (largest: 18). Sources are snapshots and need rechecking before use beyond the demo.

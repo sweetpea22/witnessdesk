@@ -40,7 +40,7 @@ export function createCaseBrief(submission: Submission, profiles: RecipientProfi
   const selectedIds = new Set([...(submission.analysis?.recipientIds || []), ...(additionalAnalysis?.recipientIds || [])]);
   const sections = [
     '# Witness Desk case brief',
-    'Fictional demonstration. Evidence and model suggestions require human review. No recipient has received this case.',
+    'The submitted case is a fictional demonstration. Public reporter profiles, when included, describe real people using cited public sources. Evidence and model suggestions require human review. No recipient has received this case.',
     `Contributor alias: ${line(submission.tip.contributorAlias || 'Contributor')}  \nReceived: ${line(submission.receivedAt)}  \nSubmission: ${line(submission.id)}`,
     '## Submitted evidence text',
     'This is the text submitted by the contributor and used for comparison. For photo submissions, the contributor may have edited the model extraction.',
@@ -64,6 +64,32 @@ export function createCaseBrief(submission: Submission, profiles: RecipientProfi
     sections.push(`### ${line(profile.name)} · ${line(profile.publication)}`, `Role: ${line(profile.role)}  \nRegion: ${line(profile.region)}  \nSpecialties: ${profile.specialties.map(line).join(', ')}  \nPreparation provider: ${line(profile.preparationProvider)}  \nPreparation run: ${line(profile.preparationRunId)}`, citations(profile.supportingCitations));
   }
   if (!profiles.some(profile => selectedIds.has(profile.id))) sections.push('No selected recipient profile is available.');
+  const matchRun = submission.reporterMatch;
+  if (matchRun?.state === 'ready') {
+    sections.push('## Public reporter matches', `Matching provider: ${line(matchRun.provider)}  \nModel: ${line(matchRun.model || 'Not recorded')}  \nDuration: ${matchRun.durationMs ?? 'Not recorded'} ms  \nCohorts: ${matchRun.cohortIds.map(line).join(', ')}  \nPreparation run: ${line(matchRun.preparationRunId || 'Not recorded')}`, 'Profiles and source excerpts below are the inputs saved with this matching run. A match indicates reporting relevance, not verified identity, availability, or willingness to accept a tip.');
+    if (matchRun.verification?.securityVerified) {
+      const verification = matchRun.verification;
+      sections.push('### Matching inference verification', `Verified at: ${line(verification.verifiedAt)}  \nEnclave host: ${line(verification.enclaveHost)}  \nConfiguration repository: ${line(verification.configRepo)}  \nRelease digest: ${line(verification.releaseDigest)}  \nCode fingerprint: ${line(verification.codeFingerprint)}  \nEnclave fingerprint: ${line(verification.enclaveFingerprint)}`);
+    }
+    for (const [index, match] of (matchRun.matches || []).entries()) {
+      // A later network refresh must not silently change the provenance of an earlier match.
+      const profile = matchRun.profiles?.find(candidate => candidate.id === match.recipientId);
+      if (!profile) { sections.push(`### Match ${index + 1}`, 'The profile snapshot is unavailable.'); continue; }
+      sections.push(`### ${index + 1}. ${line(profile.name)} · ${line(profile.publication)}`, `Role: ${line(profile.role)}  \nRegion: ${line(profile.region)}  \nSpecialties: ${profile.specialties.map(line).join(', ')}  \nProfile preparation provider: ${line(profile.preparationProvider)}  \nProfile preparation run: ${line(profile.preparationRunId)}`, `Matching reason: ${line(match.reason)}`);
+      for (const sourceId of match.sourceIds) {
+        const source = profile.sources.find(candidate => candidate.id === sourceId);
+        if (!source) { sections.push(`Source ${line(sourceId)} is unavailable in the matching snapshot.`); continue; }
+        sections.push(`#### ${line(source.title)}`, `Source document: ${line(source.id)}  \nSource type: ${line(source.sourceType || 'Not recorded')}  \nRelationship: ${line(source.relation || 'Not recorded')}  \nRetrieved: ${line(source.retrievedAt || 'Not recorded')}`);
+        if (source.url) sections.push('Exact source URL:', excerpt(source.url));
+        const supporting = profile.supportingCitations.filter(citation => citation.documentId === source.id);
+        sections.push(supporting.length ? citations(supporting) : excerpt(source.text));
+      }
+      if (profile.publicContact) sections.push(`Public professional contact page (${profile.publicContact.scope}):`, excerpt(profile.publicContact.url), `Contact source: ${line(profile.publicContact.sourceId)}`);
+    }
+    if (!matchRun.matches?.length) sections.push('No supported public reporter matches.');
+  } else if (matchRun) {
+    sections.push('## Public reporter matches', matchRun.state === 'matching' ? 'Matching is in progress; no completed result is included.' : 'Matching failed; no completed result is included.');
+  }
   return sections.join('\n\n') + '\n';
 }
 

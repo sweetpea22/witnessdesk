@@ -1,8 +1,8 @@
 # Localpoast — Witness Desk
 
-Phone-to-laptop whistleblowing demo. Cindy's organization received an invoice for **$120,000** but sent **$350,000**. The desk surfaces the **$230,000** difference with source passages and recommends a reporter from a private, source-backed recipient graph.
+Phone-to-laptop whistleblowing demo. Cindy's organization received an invoice for **$120,000** but sent **$350,000**. The desk surfaces the **$230,000** difference with source passages, recommends relevant reporters from public reporting sources, and lets the operator prepare a reviewed story packet for one selected reporter.
 
-All initial people, publications, and documents are fictional. This prototype does not establish source anonymity or geographic presence.
+Cindy's case documents and the original three demo recipients are fictional. The public reporter network contains six real ProPublica journalism professionals in US finance and corporate-accountability cohorts, backed by twelve official sources. They are not enrolled in Poast. This prototype does not establish source anonymity, recipient identity, or geographic presence.
 
 ## Development
 
@@ -23,11 +23,24 @@ Ollama must be running with `llama3:8b` (or change `OLLAMA_MODEL` to another ins
 
 With a configured Tinfoil key, the desk also offers **Review with Tinfoil** after the initial analysis. This is an explicit additional request: reviewed evidence text, contributor context, the seeded invoice, and recipient expertise go to Tinfoil; the image is not sent. The SDK verifies the inference enclave before sending the prompt. The result retains its verification metadata, model, questions, and recipient recommendation separately from the initial local result. Repeated clicks reuse the review, and verification/provider failures leave the local findings available. This verifies the inference service, not deployment of this app as a Tinfoil Container.
 
-**Download case brief** saves a Markdown file on the desk operator's computer with source quotes, amounts, model provenance, and recipient supporting sources. It includes completed Tinfoil verification metadata when available. It does not send anything to a recipient or include photo bytes, pairing links, or access capabilities.
+The recipient network defaults to **Public reporters**. Choose a cohort, inspect the official sources, and use **Refresh public sources** to fetch the twelve allowlisted pages and check their excerpts. **Prepare with Darkbloom** extracts source-backed coverage from the reviewed public snapshot; **Prepare locally** uses Ollama. Unsupported quotes, sources, and topics fail validation. A failed refresh preserves the prior profiles with their original provenance and does not claim a successful refresh.
 
-The local recipient pipeline reads articles in fixtures, asks a local Ollama model to extract expertise with exact supporting quotes, validates the quotations, then constructs recipient/article/topic/region relationships. Open the recipient graph to inspect its sources. Darkbloom is a separate adapter; Ollama execution is never labeled as Darkbloom use.
+For an analyzed case, **Find matches locally** sends the private evidence and the prepared public profiles only to loopback Ollama. On the hosted desk, the explicit action is **Find matches with Tinfoil**. Each match stores its own profile snapshot, explanation, and supporting source IDs. The public preparation API has no private-tip input. Darkbloom is the preparation provider, not the local inference engine. Cognee is not integrated.
 
-Read [the complete source-to-graph flow](src/recipients/README.md). The checked-in preparation cache now contains the successful Darkbloom run over six fictional articles; the earlier local-model run was also verified. The network view can rerun preparation. It displays provider, model, run time, and sources. Private matching uses those validated profiles; the tip is never an input to public-corpus preparation.
+The refreshed Darkbloom cache contains six profiles produced from twelve public sources; a live local matching run selected Jeff Ernsthausen and Paul Kiel for Cindy's synthetic case. The graph has 22 nodes and 30 source-linked edges. Coverage region remains curated profile metadata; the graph makes no geographic-presence claim. This small single-newsroom seed is not a comprehensive directory or proof of interest in the story. See [public-source provenance and limitations](docs/reporter-sources.md) and [the live execution report](docs/public-reporter-live-check.md). The original fictional corpus remains available under **Demo reporters** for repeatable baseline checks; [its source-to-graph flow](src/recipients/README.md) is documented separately.
+
+## Finish with a story packet
+
+1. Analyze the submitted payment and find public reporter matches.
+2. Open **Prepare story packet**, choose one matched reporter, and prepare the draft. It includes the original invoice and reviewed payment text, literal record dates, the amount comparison, open questions, that reporter's supporting sources, and processing provenance.
+3. Edit the preview and check **I reviewed this story packet.** Editing again clears that confirmation.
+4. Choose **Download story packet** for the reviewed Markdown and **Download evidence manifest** for the accompanying JSON. Both files stay on the operator's computer. No email or other onward delivery is implemented.
+
+The manifest preserves the original evidence and provenance separately from the edited Markdown, and includes a SHA-256 hash of the exact reviewed Markdown. Removing a detail from the preview does **not** remove it from the manifest's original evidence. Inspect both files before sharing. The hash checks file consistency; it does not establish evidence truth, recipient identity, or an attestation.
+
+The packet does not automatically add the contributor alias, intake context, receipt time, submission ID, session credentials, or photo bytes. The synthetic browser check confirmed Cindy's name and private intake metadata were absent. This is not automatic anonymization or redaction: exact evidence text, model output, operator edits, and optional photo analysis can still identify a source. Photo analysis is opt-in and labeled unverified.
+
+The older **Download case brief** remains available as a secondary summary with source quotes, amounts, model provenance, and recipient supporting sources. It includes completed Tinfoil verification metadata when available; use the story-packet flow to select a public reporter and review the final artifact.
 
 ## Photo and vision flow
 
@@ -49,7 +62,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite needs running Ollama; the Tinfoil flow also requires a valid `TINFOIL_API_KEY`. It exercises actual inference, independent phone/desk browser contexts, encrypted request bodies, a dropped receipt and idempotent retry, source inspection, changed payment amounts, preview pairing, a real image-to-description run, reader-only image access, verified Tinfoil review, local brief download, and reconnecting an expired desk. Run the sponsor flow alone with `npx playwright test tinfoil-flow.spec.ts`. Screenshots are saved locally under ignored `artifacts/qa-phone-flow/`.
+The browser suite needs running Ollama; the Tinfoil flow also requires a valid `TINFOIL_API_KEY`. It exercises actual inference, independent phone/desk browser contexts, encrypted request bodies, a dropped receipt and idempotent retry, source inspection, changed payment amounts, preview pairing, a real image-to-description run, reader-only image access, verified Tinfoil review, and reconnecting an expired desk. The public-reporter flow checks actual local matching, recipient selection, editing, both story-packet downloads, their SHA-256 binding, and omission of private intake metadata. Run that flow with `npx playwright test public-reporters-flow.spec.ts`, or the Tinfoil flow with `npx playwright test tinfoil-flow.spec.ts`. Screenshots are saved locally under ignored `artifacts/qa-phone-flow/`.
 
 The Dockerfile builds a standalone app serving the frontend and API on port 3001. `docker build -t localpoast:demo .` builds for the host architecture. Tinfoil deployment requires a supported image architecture, registry digest, measured config release, and actual instance verification; a local Docker build is not that deployment.
 
@@ -61,7 +74,7 @@ Reader and sender capabilities are separate; sender access cannot read or reset 
 
 ## Sponsor readiness
 
-The [hosted phone and desk preview](https://localpoast.janedoe.containers.tinfoil.dev/preview) now runs as a verified Tinfoil Container using public config release v0.0.3 and a private application image. The live encrypted API and production browser text flows passed: Cindy's $230,000 discrepancy, exact citations, verified Tinfoil inference, Darkbloom-prepared recipient matching, brief download, and session reset. [Deployment and verification details](docs/tinfoil-deployment.md) include repeatable checks and the startup fixes. Hosted intake currently supports text; photo interpretation still runs on the local laptop.
+The recorded hosted baseline is public config release **v0.0.3** with a private application image at the [phone and desk preview](https://localpoast.janedoe.containers.tinfoil.dev/preview). Its encrypted API and production browser text flows passed: Cindy's $230,000 discrepancy, exact citations, verified Tinfoil inference, matching against the original Darkbloom-prepared demo profiles, case-brief download, and session reset. This historical deployment result does not establish deployment of the new public-reporter story-packet flow. [Deployment and verification details](docs/tinfoil-deployment.md) record the hosted version and repeatable checks. Hosted intake supports text; photo interpretation still runs on the local laptop.
 
 See [sponsor execution evidence and remaining gates](docs/sponsor-evidence.md). The [event submission instructions](https://localhostai.nyc/submitting) require a public repository and two-minute video by 5 PM. This repository is currently private as requested; publication, collaborator invitations, and event submission have not been performed.
 
